@@ -24,8 +24,8 @@ if(!window.hatchWidget){
 #botlayer{position:absolute;inset:0;z-index:2;pointer-events:none}
 .botwrap{position:absolute;left:50%;transform:translateX(-50%);transition:width .8s cubic-bezier(.5,0,.2,1),top .8s cubic-bezier(.5,0,.2,1)}
 .botm{width:100%;display:block;transition:opacity .45s ease}
-.botstack{position:relative;animation:bob 3.6s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.botstack{position:relative;animation:bob 3.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-9px) rotate(1.3deg)}}
 .botstack .botm{position:absolute;left:0;top:0}
 .botstack .botm:first-child{position:relative}
 .say{position:absolute;left:0;right:0;text-align:center;font-weight:800;line-height:1.55;padding:0 26px;z-index:4;color:#221a10}
@@ -85,6 +85,7 @@ var QS = [
  {k:'雰囲気', q:'どんな雰囲気がいい？', opts:[['洒','おしゃれ',''],['静','静か',''],['賑','にぎやか',''],['渋','渋い老舗','']]},
  {k:'お酒', q:'何が飲みたい？', opts:[['梅','梅酒',''],['酒','日本酒',''],['ウ','ウイスキー',''],['麦','ビール',''],['葡','ワイン',''],['何','何でも','']]},
  {k:'おつまみ', q:'おつまみは、どんなのがいい？', opts:[['肉','肉系','焼きとん・焼き鳥'],['魚','海鮮','刺身・寿司'],['揚','揚げ物','天ぷら・串カツ'],['菜','野菜','サラダ系'],['締','締め','蕎麦・麺'],['何','何でも','']]},
+ {k:'飲み放題', q:'飲み放題は？', opts:[['放','あった方がいい',''],['単','なくてもいい','']]},
  {k:'酔い', q:'どのくらい酔いたい？', opts:[['軽','ちょい酔い',''],['程','しっかり',''],['酔','ベロベロ','']]}
 ];
 var DRINK = {'梅酒':['梅酒'],'日本酒':['日本酒'],'ウイスキー':['ウイスキー','モルト','バーボン'],'ビール':['ビール','クラフトビール','エール'],'ワイン':['ワイン','シャンパン']};
@@ -102,6 +103,7 @@ function score(sh, ans){
   if(blim){ var bm = budgetMin(sh.b); if(bm <= blim) sc += 2; else if(bm <= blim + 1500) sc += 0.5; }
   if(sh.ts) sc += (parseFloat(sh.ts) - 3.3) * 2;
   if(sh.gs) sc += (parseFloat(sh.gs) - 4.0) * 2;
+  if(ans['飲み放題']==='あった方がいい'){ if(txt.indexOf('飲み放題')>=0) sc += 4; else sc -= 1.5; }
   if(ans['酔い']==='ベロベロ' && /深夜|朝飲み|24時間/.test(sh.h + sh.tags.join(''))) sc += 1;
   return sc;
 }
@@ -120,6 +122,7 @@ function badges(sh){
   var h = '';
   if(sh.gs) h += '<span class="sc g">G ★'+sh.gs+'</span>';
   if(sh.ts) h += '<span class="sc t">食 '+sh.ts+'</span>';
+  if((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0) h += '<span class="sc t">飲み放題あり</span>';
   return h;
 }
 function cardHtml(sh, idx){
@@ -135,7 +138,7 @@ function botHtml(){
       + '<video class="botm botvid" id="botB" muted playsinline preload="auto" style="opacity:0"></video>'
       + '</div></div>';
   }
-  return '<div class="botwrap" id="botwrap"><img class="botm" src="'+MASCOT+'"></div>';
+  return '<div class="botwrap" id="botwrap"><div class="botstack"><img class="botm" src="'+MASCOT+'"></div></div>';
 }
 function setBot(cls, vid){
   var w = document.getElementById('botwrap'); if(!w) return;
@@ -179,13 +182,12 @@ function render(){
   } else if(s.screen==='ask'){
     setBot('sz-ask', 'asking');
     var cur = QS[s.step];
-    h = '<button class="backbtn" onclick="backStep()">← もどる</button><div class="brand">の ん び ー</div>'
+    h = '<button class="backbtn" onclick="backStep()">← もどる</button>'
       + '<div class="qbox"><div class="qtext">'+cur.q+' <span class="pg">('+(s.step+1)+'/'+QS.length+')</span></div>'
       + '<div class="bars">'+cur.opts.map(function(o){return '<button class="bar" onclick="answer(\''+cur.k+'\',\''+o[1]+'\')"><span class="lb">'+o[1]+'</span>'+(o[2]?'<span class="sub">'+o[2]+'</span>':'')+'</button>'}).join('')+'</div></div>';
   } else if(s.screen==='think'){
     setBot('sz-think', 'thinking');
-    h = '<div class="brand">の ん び ー</div>'
-      + '<div class="say tdots" style="bottom:150px"><span></span><span></span><span></span></div>'
+    h = '<div class="say tdots" style="bottom:150px"><span></span><span></span><span></span></div>'
       + '<div class="say" style="bottom:112px;font-size:15px;color:#7a5f2e">池袋の144軒から探してるよ</div>';
   } else if(s.screen==='results'){
     setBot('sz-res', 'idle');
@@ -204,6 +206,7 @@ function render(){
       + '<div class="scores">'
       + (sh.gs ? '<span class="sc g">Google ★'+sh.gs+'（'+sh.gc+'件）</span>' : '')
       + (sh.ts ? '<span class="sc t">食べログ '+sh.ts+'（'+sh.tc+'件）</span>' : '')
+      + ((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0 ? '<span class="sc t">飲み放題あり</span>' : '')
       + '</div>'
       + '<div class="kv" style="margin-top:8px"><b>住所</b>'+sh.a+'<br><b>営業</b>'+sh.h+'<br><b>予算</b>'+sh.b+(sh.s ? '<br><b>酒</b>'+sh.s : '')+'</div>'
       + (sh.w ? '<div class="tip"><img src="'+MASCOT+'"><div>'+sh.w+'</div></div>' : '')
@@ -242,9 +245,9 @@ botState.vid = 'idle';
 render();
 </script>
 <style>
-.sz-idle{width:436px;top:8px}
-.sz-ask{width:252px;top:0}
-.sz-think{width:330px;top:30px}
+.sz-idle{width:414px;top:10px}
+.sz-ask{width:196px;top:2px}
+.sz-think{width:300px;top:34px}
 .sz-res{width:196px;top:-4px}
 .botvid{mix-blend-mode:multiply}
 </style>
