@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#d3b896">
+<meta name="theme-color" content="#ffffff">
 <title>のんびー｜池袋パイロット</title>
-<style>body{margin:0;background:#e8dcc4;padding:10px 6px}*{box-sizing:border-box}</style>
+<style>body{margin:0;background:#ffffff;padding:10px 6px}*{box-sizing:border-box}</style>
 </head><body>
 <script>
 if(!window.hatchWidget){
@@ -18,13 +18,14 @@ if(!window.hatchWidget){
 *{box-sizing:border-box;margin:0;padding:0}
 .wrap{font-family:-apple-system,'Hiragino Sans','Noto Sans SC',sans-serif;color:var(--hatch-widget-text);padding:4px 2px 8px}
 .note{font-size:12px;color:var(--hatch-widget-muted);line-height:1.6;margin-bottom:8px}
-.phone{border:2.2px solid #17130c;border-radius:30px;overflow:hidden;height:min(640px, calc(100dvh - 30px));position:relative;background:radial-gradient(circle at 50% 30%,#dec9ac 0%,#d3b896 55%,#c6a684 100%);color:#221a10;max-width:430px;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,.15)}
-.brand{position:absolute;top:13px;left:0;right:0;text-align:center;font-size:12px;font-weight:800;letter-spacing:.4em;color:#6d5326;z-index:5}
-.area{position:absolute;top:36px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:800;color:#5d4718;background:rgba(255,255,255,.8);border:1.6px solid #8a6d3f;border-radius:999px;padding:4px 14px;z-index:5;white-space:nowrap}
+.phone{border:2.2px solid #17130c;border-radius:30px;overflow:hidden;height:min(640px, calc(100dvh - 30px));position:relative;background:#ffffff;color:#221a10;max-width:430px;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.brand{position:absolute;top:13px;left:0;right:0;text-align:center;font-size:12px;font-weight:800;letter-spacing:.4em;color:#17130c;z-index:5}
+.area{position:absolute;top:36px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:800;color:#17130c;background:#ffd83d;border:1.8px solid #17130c;border-radius:999px;padding:4px 14px;z-index:5;white-space:nowrap}
 #botlayer{position:absolute;inset:0;z-index:2;pointer-events:none}
 .botwrap{position:absolute;left:50%;transform:translateX(-50%);transition:width .8s cubic-bezier(.5,0,.2,1),top .8s cubic-bezier(.5,0,.2,1)}
 .botm{width:100%;display:block;transition:opacity .45s ease}
-.botstack{position:relative}
+.botstack{position:relative;animation:bob 3.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .botstack .botm{position:absolute;left:0;top:0}
 .botstack .botm:first-child{position:relative}
 .say{position:absolute;left:0;right:0;text-align:center;font-weight:800;line-height:1.55;padding:0 26px;z-index:4;color:#221a10}
@@ -37,6 +38,7 @@ if(!window.hatchWidget){
 .bar:active{transform:translateY(2px);box-shadow:none}
 .bdg{flex:none;width:27px;height:27px;border-radius:8px;background:#17130c;color:#ffd83d;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-right:12px}
 .bar .lb{flex:1;text-align:center}
+.bar{justify-content:center}
 .bar .sub{font-size:11.5px;color:#8a6d3f;font-weight:700;flex:none;margin-left:8px}
 .bar .sp{flex:none;width:39px}
 .backbtn{position:absolute;top:12px;left:12px;z-index:7;background:rgba(255,255,255,.9);border:1.8px solid #17130c;border-radius:999px;padding:8px 15px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit;color:#17130c}
@@ -129,8 +131,8 @@ var botState = {cls:'', vid:''};
 function botHtml(){
   if(MODE==='video'){
     return '<div class="botwrap" id="botwrap"><div class="botstack">'
-      + '<video class="botm botvid" id="botA" autoplay muted loop playsinline preload="auto" src="'+VID.idle+'"></video>'
-      + '<video class="botm botvid" id="botB" muted loop playsinline preload="auto" style="opacity:0"></video>'
+      + '<video class="botm botvid" id="botA" autoplay muted playsinline preload="auto" src="'+VID.idle+'"></video>'
+      + '<video class="botm botvid" id="botB" muted playsinline preload="auto" style="opacity:0"></video>'
       + '</div></div>';
   }
   return '<div class="botwrap" id="botwrap"><img class="botm" src="'+MASCOT+'"></div>';
@@ -140,19 +142,33 @@ function setBot(cls, vid){
   if(botState.cls !== cls){ w.className = 'botwrap ' + cls; botState.cls = cls; }
   if(MODE==='video' && vid && botState.vid !== vid){
     botState.vid = vid;
-    var A = document.getElementById('botA'), B = document.getElementById('botB');
-    var showEl = (A.style.opacity !== '0') ? A : B, hideEl = (showEl === A) ? B : A;
-    hideEl.src = VID[vid];
-    var done = function(){
-      hideEl.style.opacity = '1'; showEl.style.opacity = '0';
-      try{ hideEl.play(); }catch(e){}
-      hideEl.removeEventListener('canplay', done);
-    };
-    hideEl.addEventListener('canplay', done);
-    try{ hideEl.load(); }catch(e){}
-    setTimeout(done, 900); /* fallback if canplay is late */
+    fadeTo(VID[vid], 0);
   }
 }
+var curEl = null, altEl = null;
+function fadeTo(src, t){
+  if(!curEl){ curEl = document.getElementById('botA'); altEl = document.getElementById('botB'); }
+  if(!curEl || !altEl) return;
+  var from = curEl, to = altEl;
+  to.src = src;
+  var go = function(){
+    try{ to.currentTime = t || 0; }catch(e){}
+    to.style.opacity = '1'; from.style.opacity = '0';
+    try{ to.play(); }catch(e){}
+    setTimeout(function(){ try{ from.pause(); }catch(e){} }, 500);
+    curEl = to; altEl = from;
+    to.removeEventListener('canplay', go);
+  };
+  to.addEventListener('canplay', go);
+  try{ to.load(); }catch(e){}
+  setTimeout(function(){ if(curEl === from) go(); }, 800);
+}
+setInterval(function(){
+  if(MODE!=='video' || !curEl || !botState.vid) return;
+  var d = curEl.duration;
+  if(d && (d - curEl.currentTime) < 0.7){ fadeTo(VID[botState.vid], 0); } /* hide the loop cut */
+  if(curEl.ended){ fadeTo(VID[botState.vid], 0); }
+}, 240);
 function render(){
   var s = window.__S, ui = document.getElementById('ui'), h = '';
   if(s.screen==='idle'){
@@ -165,7 +181,7 @@ function render(){
     var cur = QS[s.step];
     h = '<button class="backbtn" onclick="backStep()">← もどる</button><div class="brand">の ん び ー</div>'
       + '<div class="qbox"><div class="qtext">'+cur.q+' <span class="pg">('+(s.step+1)+'/'+QS.length+')</span></div>'
-      + '<div class="bars">'+cur.opts.map(function(o){return '<button class="bar" onclick="answer(\''+cur.k+'\',\''+o[1]+'\')"><span class="bdg">'+o[0]+'</span><span class="lb">'+o[1]+'</span>'+(o[2]?'<span class="sub">'+o[2]+'</span>':'<span class="sp"></span>')+'</button>'}).join('')+'</div></div>';
+      + '<div class="bars">'+cur.opts.map(function(o){return '<button class="bar" onclick="answer(\''+cur.k+'\',\''+o[1]+'\')"><span class="lb">'+o[1]+'</span>'+(o[2]?'<span class="sub">'+o[2]+'</span>':'')+'</button>'}).join('')+'</div></div>';
   } else if(s.screen==='think'){
     setBot('sz-think', 'thinking');
     h = '<div class="brand">の ん び ー</div>'
@@ -226,10 +242,10 @@ botState.vid = 'idle';
 render();
 </script>
 <style>
-.sz-idle{width:412px;top:14px}
-.sz-ask{width:200px;top:0}
-.sz-think{width:292px;top:38px}
-.sz-res{width:178px;top:-4px}
-.botvid{-webkit-mask-image:radial-gradient(ellipse 82% 76% at 50% 47%,#000 44%,transparent 71%);mask-image:radial-gradient(ellipse 82% 76% at 50% 47%,#000 44%,transparent 71%)}
+.sz-idle{width:436px;top:8px}
+.sz-ask{width:252px;top:0}
+.sz-think{width:330px;top:30px}
+.sz-res{width:196px;top:-4px}
+.botvid{mix-blend-mode:multiply}
 </style>
 </body></html>
