@@ -6,8 +6,8 @@ def ok(cond, msg):
     if not cond: fails.append(msg)
 
 html = open(ROOT + "/index.html").read()
-ok("assets/bot.png" in html, "index references bot.png")
-for a in ("bot.png", "hana.jpg", "kaze.jpg", "elm.jpg"):
+ok("assets/bot.webp" in html, "index references bot.webp")
+for a in ("bot.webp", "hana.jpg", "kaze.jpg", "elm.jpg"):
     ok(os.path.exists(ROOT + "/assets/" + a), "asset exists: " + a)
     ok(os.path.getsize(ROOT + "/assets/" + a) > 3000, "asset non-trivial: " + a)
 m = re.search(r"<script>\nvar MODE(.*?)</script>", html, re.S)
