@@ -20,13 +20,16 @@ if(!window.hatchWidget){
 .note{font-size:12px;color:var(--hatch-widget-muted);line-height:1.6;margin-bottom:8px}
 .phone{border:2.2px solid #1c150c;border-radius:30px;overflow:hidden;height:min(640px, calc(100dvh - 30px));position:relative;background:linear-gradient(180deg,#f3e4ca 0%,#eddcc0 58%,#e8d3b1 100%);color:#221a10;max-width:430px;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 .brand{position:absolute;top:13px;left:0;right:0;text-align:center;font-size:11.5px;font-weight:800;letter-spacing:.4em;color:#96793f;z-index:5}
-.area{position:absolute;top:36px;left:0;right:0;text-align:center;font-size:11px;font-weight:700;color:#a5854f;z-index:5}
+.area{position:absolute;top:34px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;color:#7a5f2e;background:rgba(255,255,255,.75);border:1.6px solid #c9a86a;border-radius:999px;padding:4px 14px;z-index:5;white-space:nowrap}
+.botvid{animation:none !important;-webkit-mask-image:radial-gradient(ellipse 72% 66% at 50% 47%,#000 52%,transparent 76%);mask-image:radial-gradient(ellipse 72% 66% at 50% 47%,#000 52%,transparent 76%)}
 .botimg{position:absolute;left:50%;transform:translateX(-50%);object-fit:cover;z-index:2;filter:drop-shadow(0 16px 13px rgba(120,85,40,.28));transition:all .7s cubic-bezier(.5,0,.2,1);animation:bob 3.6s ease-in-out infinite}
 @keyframes bob{0%,100%{margin-top:0}50%{margin-top:-9px}}
 .say{position:absolute;left:0;right:0;text-align:center;font-weight:800;line-height:1.55;padding:0 30px;z-index:4;transition:all .5s}
+.backbtn{position:absolute;top:12px;left:12px;z-index:7;background:rgba(255,255,255,.85);border:1.8px solid #17130c;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit}
 .pillbtn{position:absolute;left:50%;transform:translateX(-50%);background:#17130c;color:#ffd83d;font-weight:800;font-size:16px;border-radius:999px;padding:14px 38px;z-index:4;cursor:pointer;border:none;font-family:inherit}
-.chips{position:absolute;left:0;right:0;bottom:20px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:0 20px;z-index:4}
-.chip{background:rgba(255,255,255,.92);border:1.8px solid #17130c;border-radius:999px;padding:10px 17px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+.chips{position:absolute;left:0;right:0;bottom:14px;display:flex;flex-direction:column;gap:7px;padding:0 22px;z-index:4}
+.chip{background:rgba(255,255,255,.95);border:2px solid #17130c;border-radius:14px;padding:11px 0;font-size:15.5px;font-weight:800;cursor:pointer;font-family:inherit;width:100%;text-align:center;box-shadow:0 2px 0 #17130c}
+.chip:active{transform:translateY(2px);box-shadow:none}
 .dots{position:absolute;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.5em;color:#a5854f;z-index:4}
 .tdots span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#17130c;margin:0 3.5px;animation:tp 1s infinite}
 .tdots span:nth-child(2){animation-delay:.18s}.tdots span:nth-child(3){animation-delay:.36s}
@@ -35,15 +38,15 @@ if(!window.hatchWidget){
 @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
 .grip{width:40px;height:4.5px;border-radius:99px;background:#ddd;margin:0 auto 10px}
 .card{border:2px solid #111;border-radius:15px;overflow:hidden;margin-bottom:10px;cursor:pointer}
-.card img{width:100%;height:92px;object-fit:cover;display:block}
-.noimg{height:64px;background:linear-gradient(120deg,#f3e4ca,#e8d3b1);display:flex;align-items:center;justify-content:center;font-weight:800;color:#96793f;font-size:13px;letter-spacing:.15em;text-align:center;padding:0 10px}
+.card img{width:100%;height:112px;object-fit:cover;display:block}
+.noimg{height:84px;background:linear-gradient(120deg,#f3e4ca,#e8d3b1);display:flex;align-items:center;justify-content:center;font-weight:800;color:#96793f;font-size:13px;letter-spacing:.15em;text-align:center;padding:0 10px}
 .cb{padding:8px 11px}.nm{font-weight:800;font-size:14px}.mt{font-size:11.5px;color:#555;margin-top:2px;line-height:1.55}
 .scores{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
 .sc{font-size:10.5px;font-weight:800;border-radius:6px;padding:2.5px 7px}
 .sc.g{background:#111;color:#ffd83d}.sc.t{background:#ffd83d;color:#111;border:1.2px solid #111}
 .kv{font-size:13px;line-height:1.95}.kv b{display:inline-block;min-width:60px;color:#555}
 .btnrow{display:flex;gap:8px;margin-top:12px}
-.btn{flex:1;text-align:center;border-radius:12px;padding:13px 0;font-weight:800;font-size:14.5px;cursor:pointer;text-decoration:none;display:block;font-family:inherit}
+.btn{flex:1;text-align:center;border-radius:12px;padding:15px 0;font-weight:800;font-size:14.5px;cursor:pointer;text-decoration:none;display:block;font-family:inherit}
 .btn.tel{background:#ffd83d;color:#111;border:2px solid #111}.btn.map{background:#111;color:#ffd83d;border:2px solid #111}
 .btn.off{background:#eee;color:#999;border:2px solid #ccc}
 .tip{display:flex;gap:7px;background:#fff8d6;border:1.8px dashed #b8860b;border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.6;margin-top:10px}
@@ -57,7 +60,7 @@ if(!window.hatchWidget){
 .pcancel{display:block;width:100%;text-align:center;padding:11px;font-weight:700;font-size:13.5px;color:#888;background:none;border:none;cursor:pointer;font-family:inherit}
 </style>
 <div class="wrap">
-<div class="note">のんびー 試作版（池袋パイロット144軒）。地図ボタンは毎回えらぶ方式（Google／Apple／Yahoo）。</div>
+<div class="note">舞台型プロトタイプ v8（池袋パイロット・長条ボタン版）：池袋144軒の実データから実際に選びます。地図ボタンは毎回えらぶ方式（Google／Apple／Yahoo）。</div>
 <div class="phone" id="ph"></div>
 </div>
 <script>
@@ -105,35 +108,34 @@ function badges(sh){
 }
 function cardHtml(sh, idx){
   var top = sh.img ? '<img src="'+PH[sh.img]+'">' : '<div class="noimg">'+sh.g+'</div>';
-  return '<div class="card" onclick="openShop('+idx+')">' + top + '<div class="cb"><div class="nm">'+sh.n+'</div><div class="mt">'+(sh.tags.slice(0,3).join('・')||sh.g)+' ｜ '+sh.b+'</div><div class="scores">'+badges(sh)+'</div></div></div>';
+  return '<div class="card" onclick="openShop('+idx+')">' + top + '<div class="cb"><div class="nm" style="font-size:15px">'+sh.n+'</div><div class="scores">'+badges(sh)+'</div><div class="mt">'+sh.g+' ｜ '+sh.b+'</div><div class="mt" style="color:#96793f;font-weight:700">'+sh.tags.slice(0,4).join('・')+'</div></div></div>';
 }
 function render(){
   var s = window.__S, ph = document.getElementById('ph'), h = '';
   if(s.screen==='idle'){
     h = '<div class="brand">の ん び ー</div><div class="area">エリア：池袋（144軒）</div>'
-      + '<img class="botimg" src="'+MASCOT+'" style="width:336px;top:52px">'
+      + '<video class="botimg botvid" src="assets/idle.mp4" autoplay muted loop playsinline style="width:400px;top:26px"></video>'
       + '<div class="say" style="bottom:128px;font-size:20px">今日はどこで飲む？</div>'
       + '<button class="pillbtn" style="bottom:52px" onclick="go(\'ask\')">はじめる</button>';
   } else if(s.screen==='ask'){
     var cur = QS[s.step];
-    h = '<div class="brand">の ん び ー</div>'
-      + '<img class="botimg" src="'+MASCOT+'" style="width:252px;top:20px">'
-      + '<div class="say" style="bottom:140px;font-size:18px">'+cur.q+'</div>'
-      + '<div class="dots" style="bottom:112px">'+QS.map(function(_,i){return i<=s.step?'●':'○'}).join(' ')+'</div>'
+    h = '<button class="backbtn" onclick="backStep()">← もどる</button><div class="brand">の ん び ー</div>'
+      + '<video class="botimg botvid" src="assets/asking.mp4" autoplay muted loop playsinline style="width:212px;top:2px"></video>'
+      + '<div class="say" style="top:240px;font-size:18px">'+cur.q+' <span style="font-size:12px;color:#a5854f">('+(s.step+1)+'/5)</span></div>'
       + '<div class="chips">'+cur.opts.map(function(o){return '<button class="chip" onclick="answer(\''+cur.k+'\',\''+o+'\')">'+o+'</button>'}).join('')+'</div>';
   } else if(s.screen==='think'){
     h = '<div class="brand">の ん び ー</div>'
-      + '<img class="botimg" src="'+MASCOT+'" style="width:296px;top:60px">'
+      + '<video class="botimg botvid" src="assets/thinking.mp4" autoplay muted loop playsinline style="width:300px;top:44px"></video>'
       + '<div class="say tdots" style="bottom:150px"><span></span><span></span><span></span></div>'
       + '<div class="say" style="bottom:112px;font-size:14px;color:#8a6d3f">池袋の144軒から探してるよ</div>';
   } else if(s.screen==='results'){
     var list = s.order.slice(0, s.shown);
-    h = '<img class="botimg" src="'+MASCOT+'" style="width:172px;top:0">'
+    h = '<video class="botimg botvid" src="assets/idle.mp4" autoplay muted loop playsinline style="width:190px;top:0"></video>'
       + '<div class="say" style="top:196px;font-size:15px">まずこの3軒、どう？</div>'
       + '<div class="sheet" style="top:236px"><div class="grip"></div>'
       + list.map(function(i){ return cardHtml(SHOPS[i], i); }).join('')
       + (s.shown < Math.min(15, s.order.length) ? '<button class="more" onclick="more()">もっと見る（+6軒）</button>' : '')
-      + '<button class="back" onclick="go(\'idle\')">← 最初から</button></div>';
+      + '<div style="display:flex;gap:14px"><button class="back" onclick="go(\'idle\')">← 最初から</button><button class="back" onclick="editAns()">条件を変える</button></div></div>';
   } else if(s.screen==='detail'){
     var sh = SHOPS[s.shop];
     var top2 = sh.img ? '<img src="'+PH[sh.img]+'" style="width:100%;height:158px;object-fit:cover;border-radius:12px">' : '<div class="noimg" style="height:92px;border-radius:12px">'+sh.g+'（写真は準備中）</div>';
@@ -168,6 +170,8 @@ function answer(k, v){
   else { window.__S.screen='think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen='results'; save(); render(); }, 1700); return; }
   save(); render();
 }
+function backStep(){ if(window.__S.step > 0){ window.__S.step--; } else { window.__S.screen='idle'; } save(); render(); }
+function editAns(){ window.__S.screen='ask'; window.__S.step=0; save(); render(); }
 function more(){ window.__S.shown = Math.min(15, window.__S.shown + 6); save(); render(); }
 function openShop(id){ window.__S.shop=id; window.__S.screen='detail'; save(); render(); }
 function setPick(b){ window.__S.pick=b; save(); render(); }
