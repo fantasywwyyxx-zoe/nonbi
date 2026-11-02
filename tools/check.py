@@ -11,6 +11,7 @@ ok("assets/logo.png" in html, "index references logo.png")
 ok("getElementById('stage')" not in html and "spawnBurst" in html, "foam bursts mount on #ph (no #stage exists)")
 ok("orderNear" in html and "setSort" in html and "近い順" in html and "おすすめ順" in html, "near-sort toggle present")
 ok("peek" in html and "margin-top:auto" in html and "top:0;height:100%" in html and "border-top:none" in html, "detail full-page + peek robot + sunk action row")
+ok(".sc.d{background:#ffffff" in html and "margin-left:auto" in html, "distance chip separated at right")
 for a in ("bot-hi.webp", "hana.jpg", "kaze.jpg", "elm.jpg", "logo.png"):
     ok(os.path.exists(ROOT + "/assets/" + a), "asset exists: " + a)
     ok(os.path.getsize(ROOT + "/assets/" + a) > 3000, "asset non-trivial: " + a)

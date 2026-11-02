@@ -65,7 +65,7 @@ if(!window.hatchWidget){
 .scores{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
 .sc{font-size:11.5px;font-weight:800;border-radius:6px;padding:3px 8px}
 .sc.g{background:#111;color:#ffd83d}.sc.t{background:#ffd83d;color:#111;border:1.2px solid #111}
-.sc.d{background:#17130c;color:#ffab5e}
+.sc.d{background:#ffffff;color:#17130c;border:1.8px solid #17130c;margin-left:auto;font-size:12px}
 .sortrow{display:flex;gap:6px;margin:0 0 10px}
 .sortbtn{flex:1;padding:8px 0;border-radius:999px;border:1.8px solid #17130c;background:#fff;font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer;color:#17130c}
 .sortbtn.on{background:#17130c;color:#fff}
@@ -158,10 +158,11 @@ function mapUrl(kind, q){
 }
 function badges(sh){
   var h = '';
-  var dm = havM(basePos(), shopLL(sh)); if(dm !== null) h += '<span class="sc d">' + fmtDist(dm) + '</span>';
+
   if(sh.gs) h += '<span class="sc g">G ★'+sh.gs+'</span>';
   if(sh.ts) h += '<span class="sc t">食 '+sh.ts+'</span>';
   if((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0) h += '<span class="sc n">飲み放題あり</span>';
+  var dm = havM(basePos(), shopLL(sh)); if(dm !== null) h += '<span class="sc d">' + fmtDist(dm) + '</span>';
   return h;
 }
 function cardHtml(sh, idx, pos){
@@ -231,6 +232,7 @@ function render(){ syncArea();
       + (sh.gs ? '<span class="sc g">Google ★'+sh.gs+'（'+sh.gc+'件）</span>' : '')
       + (sh.ts ? '<span class="sc t">食べログ '+sh.ts+'（'+sh.tc+'件）</span>' : '')
       + ((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0 ? '<span class="sc n">飲み放題あり</span>' : '')
+      + (havM(basePos(), shopLL(sh)) !== null ? '<span class="sc d">' + fmtDist(havM(basePos(), shopLL(sh))) + '</span>' : '')
       + '</div>'
       + '<div class="kv" style="margin-top:8px"><div class="krow"><b>住所</b><span>'+sh.a+'</span></div><div class="krow"><b>営業</b><span>'+sh.h+'</span></div><div class="krow"><b>予算</b><span>'+sh.b+'</span></div>'+(sh.s ? '<div class="krow"><b>酒</b><span>'+sh.s+'</span></div>' : '')+'</div>'
       + (sh.w ? '<div class="tip"><img src="'+ANIM.idle+'"><div>'+sh.w+'</div></div>' : '')
