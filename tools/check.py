@@ -6,9 +6,9 @@ def ok(cond, msg):
     if not cond: fails.append(msg)
 
 html = open(ROOT + "/index.html").read()
-ok("assets/anim-master.webp" in html, "index references anim-master.webp")
+ok("assets/bot-hi.webp" in html, "index references bot-hi.webp")
 ok("getElementById('stage')" not in html and "spawnBurst" in html, "foam bursts mount on #ph (no #stage exists)")
-for a in ("anim-master.webp", "hana.jpg", "kaze.jpg", "elm.jpg"):
+for a in ("bot-hi.webp", "hana.jpg", "kaze.jpg", "elm.jpg"):
     ok(os.path.exists(ROOT + "/assets/" + a), "asset exists: " + a)
     ok(os.path.getsize(ROOT + "/assets/" + a) > 3000, "asset non-trivial: " + a)
 m = re.search(r"<script>\nvar MODE(.*?)</script>", html, re.S)
