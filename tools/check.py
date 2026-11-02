@@ -7,6 +7,7 @@ def ok(cond, msg):
 
 html = open(ROOT + "/index.html").read()
 ok("assets/anim-master.webp" in html, "index references anim-master.webp")
+    ok("getElementById('stage')" not in html and "spawnBurst" in html, "foam bursts mount on #ph (no #stage exists)")
 for a in ("anim-master.webp", "hana.jpg", "kaze.jpg", "elm.jpg"):
     ok(os.path.exists(ROOT + "/assets/" + a), "asset exists: " + a)
     ok(os.path.getsize(ROOT + "/assets/" + a) > 3000, "asset non-trivial: " + a)
