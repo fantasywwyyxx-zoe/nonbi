@@ -20,7 +20,7 @@ if m:
 S = json.load(open(ROOT + "/data/ikebukuro.json"))
 ok(len(S) == 144, "data has 144 shops (got %d)" % len(S))
 ok(all(s["n"] and s["a"] for s in S), "every shop has name + address")
-HIRA = set("はがをにへともでしてくなりますやよかねぞわ")
+HIRA = set("はがをにへともでしてくなりますやよかねぞわのんた")
 KATA = set(chr(c) for c in range(0x30A1, 0x30F7))
 def is_zh(t):
     if not t or len(t) < 6: return False
@@ -42,5 +42,8 @@ ok(sum(1 for s in SJ if s["ts"]) == 151, "shinjuku tabelog-scored == 151")
 ok(sum(1 for s in SJ if s["gs"]) == 16, "shinjuku google-scored == 16")
 ok(len(set(s["id"] for s in SJ)) == 190, "shinjuku ids unique")
 ok(os.path.exists(ROOT + "/version.txt"), "version.txt present")
+ok("user-scalable=no" in html, "viewport locks double-tap zoom")
+ok("-webkit-touch-callout" in html and "touch-action:manipulation" in html, "long-press callout off + touch-action set")
+ok("position:sticky" in html, "detail action row is sticky")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
