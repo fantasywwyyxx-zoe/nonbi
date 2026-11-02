@@ -22,9 +22,24 @@ if(!window.hatchWidget){
 .brand{position:absolute;top:13px;left:0;right:0;text-align:center;font-size:12px;font-weight:800;letter-spacing:.4em;color:#17130c;z-index:5}
 .area{position:absolute;top:36px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:800;color:#17130c;background:#ffd83d;border:1.8px solid #17130c;border-radius:999px;padding:4px 14px;z-index:5;white-space:nowrap}
 #botlayer{position:absolute;inset:0;z-index:2;pointer-events:none}
-.botwrap{position:absolute;left:50%;transform:translateX(-50%);transition:width .8s cubic-bezier(.5,0,.2,1),top .8s cubic-bezier(.5,0,.2,1)}
+.botwrap{position:absolute;left:50%;transform:translateX(-50%);z-index:2;transition:width .8s cubic-bezier(.5,0,.2,1),top .8s cubic-bezier(.5,0,.2,1)}
 .botm{width:100%;display:block;transition:opacity .45s ease}
 .botstack{position:relative;animation:bob 3.2s ease-in-out infinite}
+.botmid{animation:midSway 5.7s ease-in-out infinite}
+@keyframes midSway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-1.6deg)}}
+.botstack .botm{animation:breath 4.3s ease-in-out infinite}
+@keyframes breath{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+.botshadow{position:absolute;left:20%;bottom:-4px;width:60%;height:16px;border-radius:50%;background:rgba(60,40,10,.20);filter:blur(6px);animation:shPulse 3.2s ease-in-out infinite;z-index:-1}
+@keyframes shPulse{0%,100%{transform:scaleX(1);opacity:.85}50%{transform:scaleX(.92);opacity:.65}}
+.botev{transition:transform .45s cubic-bezier(.3,0,.3,1)}
+.botev.ev-hop{animation:evHop .55s cubic-bezier(.3,0,.3,1)}
+@keyframes evHop{0%{transform:translateY(0)}35%{transform:translateY(-16px)}70%{transform:translateY(1px)}100%{transform:translateY(0)}}
+.botev.ev-leanL{transform:rotate(-6deg)}
+.botev.ev-leanR{transform:rotate(6deg)}
+.botev.ev-squash{animation:evSquash .6s ease-in-out}
+@keyframes evSquash{0%,100%{transform:scale(1,1)}40%{transform:scale(1.04,.93)}}
+.botev.ev-look{animation:evLook 1.1s ease-in-out}
+@keyframes evLook{0%,100%{transform:translateX(0)}30%{transform:translateX(-9px)}65%{transform:translateX(9px)}}
 .sz-ask .botstack{animation:askSway 2.8s ease-in-out infinite}
 .sz-think .botstack{animation:thinkLean 5.2s ease-in-out infinite}
 @keyframes askSway{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-7.5deg) translateY(-5px)}}
@@ -147,7 +162,7 @@ function botHtml(){
       + '<video class="botm botvid" id="botB" muted playsinline preload="auto" style="opacity:0"></video>'
       + '</div></div>';
   }
-  return '<div class="botwrap" id="botwrap"><div class="botstack"><img class="botm" src="'+MASCOT+'"><div class="qmark">?</div></div></div>';
+  return '<div class="botwrap" id="botwrap"><div class="botev" id="botev"><div class="botmid"><div class="botstack"><img class="botm" src="'+MASCOT+'"><div class="qmark">?</div></div></div></div><div class="botshadow"></div></div>';
 }
 function setBot(cls, vid){
   var w = document.getElementById('botwrap'); if(!w) return;
@@ -247,6 +262,19 @@ function editAns(){ window.__S.screen='ask'; window.__S.step=0; save(); render()
 function more(){ window.__S.shown = Math.min(15, window.__S.shown + 6); save(); render(); }
 function openShop(id){ window.__S.shop=id; window.__S.screen='detail'; save(); render(); }
 function setPick(b){ window.__S.pick=b; save(); render(); }
+(function(){
+  var evs = ['ev-hop','ev-leanL','ev-leanR','ev-squash','ev-look','ev-hop'];
+  function tick(){
+    var el = document.getElementById('botev');
+    if(el){
+      var c = evs[Math.floor(Math.random()*evs.length)];
+      el.classList.add(c);
+      setTimeout(function(){ el.classList.remove(c); }, (c==='ev-leanL'||c==='ev-leanR') ? 1300 : 1200);
+    }
+    setTimeout(tick, 2600 + Math.random()*4200);
+  }
+  setTimeout(tick, 1800);
+})();
 window.addEventListener('hatch-widget-state', function(e){ window.__S = e.detail.state; render(); });
 window.__S = window.hatchWidget.getState(DEF);
 document.getElementById('botlayer').innerHTML = botHtml();
