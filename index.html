@@ -155,7 +155,7 @@ function mapUrl(kind, q){
 }
 function badges(sh){
   var h = '';
-  if(window.__S && window.__S.sortMode === 'near'){ var dm = havM(basePos(), shopLL(sh)); if(dm !== null) h += '<span class="sc d">' + fmtDist(dm) + '</span>'; }
+  var dm = havM(basePos(), shopLL(sh)); if(dm !== null) h += '<span class="sc d">' + fmtDist(dm) + '</span>';
   if(sh.gs) h += '<span class="sc g">G ★'+sh.gs+'</span>';
   if(sh.ts) h += '<span class="sc t">食 '+sh.ts+'</span>';
   if((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0) h += '<span class="sc n">飲み放題あり</span>';
