@@ -164,9 +164,11 @@ function botHtml(){
   }
   return '<div class="botwrap" id="botwrap"><div class="botev" id="botev"><div class="botmid"><div class="botstack"><img class="botm" src="'+MASCOT+'"><div class="qmark">?</div></div></div></div><div class="botshadow"></div></div>';
 }
-function setBot(cls, vid){
+var ASK_TOP = {2:118, 3:96, 4:72, 5:44, 6:20};
+function setBot(cls, vid, nOpts){
   var w = document.getElementById('botwrap'); if(!w) return;
   if(botState.cls !== cls){ w.className = 'botwrap ' + cls; botState.cls = cls; }
+  w.style.top = (cls === 'sz-ask' && nOpts) ? (ASK_TOP[nOpts] + 'px') : '';
   if(MODE==='video' && vid && botState.vid !== vid){
     botState.vid = vid;
     fadeTo(VID[vid], 0);
@@ -204,8 +206,8 @@ function render(){
       + '<div class="say" style="bottom:128px;font-size:21px">今日はどこで飲む？</div>'
       + '<button class="pillbtn" style="bottom:52px" onclick="go(\'ask\')">はじめる</button>';
   } else if(s.screen==='ask'){
-    setBot('sz-ask', 'asking');
     var cur = QS[s.step];
+    setBot('sz-ask', 'asking', cur.opts.length);
     h = '<button class="backbtn" onclick="backStep()">← もどる</button>'
       + '<div class="qbox"><div class="qtext">'+cur.q+' <span class="pg">('+(s.step+1)+'/'+QS.length+')</span></div>'
       + '<div class="bars'+(cur.opts.length>=6?' compact':'')+'">'+cur.opts.map(function(o){return '<button class="bar" onclick="answer(\''+cur.k+'\',\''+o[1]+'\')"><span class="lb">'+o[1]+'</span>'+(o[2]?'<span class="sub">'+o[2]+'</span>':'')+'</button>'}).join('')+'</div></div>';
