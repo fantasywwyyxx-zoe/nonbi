@@ -28,7 +28,9 @@ def is_zh(t):
     if any(c in KATA for c in t): return False
     return any('一' <= c <= '鿿' for c in t)
 ok(not any(is_zh(s["w"]) or is_zh(s["s"]) for s in S), "all user-visible text is Japanese (no Chinese fields)")
-ok(sum(1 for s in S if s["gs"] and s["ts"]) == 17, "dual-score shops == 17")
+ok(sum(1 for s in S if s["gs"] and s["ts"]) == 139, "dual-score shops == 139")
+ok(sum(1 for s in S if s.get("ph")) >= 103, "google-photo shops >= 103")
+ok(sum(1 for s in S if s.get("pid")) == 141, "place ids == 141")
 ok(sum(1 for s in S if s["ts"]) == 142, "tabelog-scored == 142")
 ok(len(set(s["id"] for s in S)) == 144, "ids unique")
 SJ = json.load(open(ROOT + "/data/shinjuku.json"))
