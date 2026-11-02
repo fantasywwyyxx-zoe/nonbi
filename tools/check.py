@@ -7,8 +7,9 @@ def ok(cond, msg):
 
 html = open(ROOT + "/index.html").read()
 ok("assets/bot-hi.webp" in html, "index references bot-hi.webp")
+ok("assets/logo.png" in html, "index references logo.png")
 ok("getElementById('stage')" not in html and "spawnBurst" in html, "foam bursts mount on #ph (no #stage exists)")
-for a in ("bot-hi.webp", "hana.jpg", "kaze.jpg", "elm.jpg"):
+for a in ("bot-hi.webp", "hana.jpg", "kaze.jpg", "elm.jpg", "logo.png"):
     ok(os.path.exists(ROOT + "/assets/" + a), "asset exists: " + a)
     ok(os.path.getsize(ROOT + "/assets/" + a) > 3000, "asset non-trivial: " + a)
 m = re.search(r"<script>\nvar MODE(.*?)</script>", html, re.S)
