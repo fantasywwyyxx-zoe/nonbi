@@ -90,9 +90,9 @@ if(!window.hatchWidget){
 .pcancel2{margin-top:9px;background:none;border:none;font-family:inherit;font-weight:700;color:#888;font-size:13.5px;cursor:pointer}
 #toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:#17130c;color:#fff;font-size:13.5px;font-weight:800;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:50;white-space:nowrap}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.peekback{position:absolute;right:12px;top:-68px;width:86px;pointer-events:none;animation:peekbob 3.4s ease-in-out infinite;z-index:1}
-.peekfront{position:absolute;right:12px;top:-68px;width:86px;pointer-events:none;animation:peekbob 3.4s ease-in-out infinite;z-index:3}
-@keyframes peekbob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+.peekback{position:absolute;right:12px;top:-64px;width:86px;pointer-events:none;transform-origin:50% 84%;animation:peektilt 7s ease-in-out infinite;z-index:1}
+.peekfront{position:absolute;right:12px;top:-64px;width:86px;pointer-events:none;transform-origin:50% 84%;animation:peektilt 7s ease-in-out infinite;z-index:3}
+@keyframes peektilt{0%,22%{transform:rotate(0deg)}34%,52%{transform:rotate(-4.2deg)}64%,82%{transform:rotate(3.4deg)}94%,100%{transform:rotate(0deg)}}
 .btnrow{display:flex;gap:8px;margin:12px -14px -16px;padding:10px 14px 14px;background:#ffffff;border-top:1.5px solid #f0e4d0;position:sticky;bottom:-16px;z-index:5}
 .btn{flex:1;text-align:center;border-radius:12px;padding:15px 0;font-weight:800;font-size:16px;cursor:pointer;text-decoration:none;display:block;font-family:inherit}
 .btn.tel{background:#ffd83d;color:#111;border:2px solid #111}.btn.map{background:#111;color:#ffd83d;border:2px solid #111}
@@ -243,11 +243,11 @@ function render(){ syncArea();
       + (s.shown < Math.min(15, s.order.length) ? '<button class="more" onclick="more()">もっと見る（+6軒）</button>' : '')
       + '<div style="display:flex;gap:14px"><button class="back" onclick="go(\'idle\')">← 最初から</button><button class="back" onclick="editAns()">条件を変える</button></div></div>';
   } else if(s.screen==='map'){
-    h = '<div style="display:flex;flex-direction:column;height:100%;background:#fff9ef">'
+    h = '<div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#fff9ef">'
       + '<div style="flex:none;padding:12px 12px 9px">'
       + '<div style="display:flex;align-items:center;gap:10px"><button class="backbtn" style="position:static;flex:none" onclick="go(\'idle\')">← もどる</button><div style="font-weight:900;font-size:18px">厳選マップ</div><div style="font-size:12px;color:#96793f;font-weight:700">' + SHOPS.filter(function(x){ return x.ll; }).length + '軒</div></div>'
       + '<div class="areaSwitch">' + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ return '<button class="asw' + (AREAKEY===k ? ' on' : '') + '" onclick="mapArea(\'' + k + '\')">' + AREAINFO[k].name + '</button>'; }).join('') + '</div></div>'
-      + '<div id="gmap" style="flex:1;position:relative;background:#e9e2d2"></div>'
+      + '<div id="gmap" style="flex:1;min-height:0;position:relative;background:#e9e2d2"></div>'
       + '<div id="mapcard"></div></div>';
   } else if(s.screen==='detail'){
     setBot('sz-res', 'idle');
@@ -383,7 +383,9 @@ async function makePoster(sh, url){
 var GMK = '__GMK__', __gmap = null, __gmarkers = [], __gmReady = null;
 function mapArea(k){ AREAKEY = k; SHOPS = AREAS[k]; window.__S.area = k; save(); render(); }
 function loadGMaps(){ if(__gmReady) return __gmReady; __gmReady = new Promise(function(res, rej){ if(window.google && google.maps) return res(); var sc = document.createElement('script'); sc.src = 'https://maps.googleapis.com/maps/api/js?key=' + GMK + '&v=weekly'; sc.onload = function(){ res(); }; sc.onerror = function(){ rej(new Error('gm')); }; document.head.appendChild(sc); }); return __gmReady; }
-function initGMap(){ var el = document.getElementById('gmap'); if(!el) return; loadGMaps().then(function(){ var el2 = document.getElementById('gmap'); if(!el2) return; var c = AREAINFO[AREAKEY]; __gmap = new google.maps.Map(el2, {center: {lat: c.lat, lng: c.lng}, zoom: 15, disableDefaultUI: true, zoomControl: true, gestureHandling: 'greedy', styles: [{featureType: 'poi', stylers: [{visibility: 'off'}]}]}); drawMarkers(); }).catch(function(){ var el3 = document.getElementById('gmap'); if(el3) el3.innerHTML = '<div style="padding:34px 20px;text-align:center;font-weight:800;color:#8a6d3f">地図を読み込めなかった…<br>電波のいい場所でもう一度開いてみて</div>'; }); }
+function mapFail(){ var mc = document.getElementById('mapcard'); if(mc && !__gmap) mc.innerHTML = '<div style="padding:14px 16px;text-align:center;font-weight:800;color:#8a6d3f;background:#fff;border-top:2px solid #17130c">地図を読み込めなかった…電波のいい場所でもう一度開いてみて</div>'; var el = document.getElementById('gmap'); if(el && !__gmap) el.innerHTML = '<div style="padding:34px 20px;text-align:center;font-weight:800;color:#8a6d3f">地図を読み込めなかった…</div>'; }
+window.gm_authFailure = function(){ mapFail(); };
+function initGMap(){ var el = document.getElementById('gmap'); if(!el) return; __gmap = null; setTimeout(mapFail, 8000); loadGMaps().then(function(){ var el2 = document.getElementById('gmap'); if(!el2) return; var c = AREAINFO[AREAKEY]; __gmap = new google.maps.Map(el2, {center: {lat: c.lat, lng: c.lng}, zoom: 15, disableDefaultUI: true, zoomControl: true, gestureHandling: 'greedy', styles: [{featureType: 'poi', stylers: [{visibility: 'off'}]}]}); drawMarkers(); }).catch(function(){ mapFail(); }); }
 function drawMarkers(){ if(!__gmap) return; __gmarkers.forEach(function(m){ m.setMap(null); }); __gmarkers = []; var pin = {url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="30" height="38" viewBox="0 0 30 38"><path d="M15 1C7.8 1 2 6.8 2 14c0 9.3 13 23 13 23s13-13.7 13-23C28 6.8 22.2 1 15 1z" fill="#ff7a00" stroke="#17130c" stroke-width="2"/><circle cx="15" cy="14" r="6" fill="#fff"/></svg>'), scaledSize: new google.maps.Size(30, 38), anchor: new google.maps.Point(15, 38)};
   SHOPS.forEach(function(sh, i){ if(!sh.ll) return; var m = new google.maps.Marker({position: {lat: sh.ll[0], lng: sh.ll[1]}, map: __gmap, icon: pin, title: sh.n}); (function(idx, ll){ m.addListener('click', function(){ showMapCard(idx); if(__gmap) __gmap.panTo({lat: ll[0], lng: ll[1]}); }); })(i, sh.ll); __gmarkers.push(m); }); }
 function showMapCard(i){ var sh = SHOPS[i]; var mc = document.getElementById('mapcard'); if(!mc || !sh) return; var im = sh.img ? PH[sh.img] : (sh.ph ? PHB + sh.ph[0] : ''); mc.innerHTML = '<div class="mapcardin">' + (im ? '<img src="' + im + '">' : '') + '<div class="mcb"><div class="nm" style="font-size:16.5px">' + sh.n + '</div><div class="scores">' + badges(sh) + '</div><div class="mt">' + sh.g + ' ｜ ' + sh.a + '</div></div><button class="mapopen" onclick="openShop(' + i + ')">くわしく</button></div>'; }
