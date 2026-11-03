@@ -74,8 +74,7 @@ if(!window.hatchWidget){
 .sharefab svg{width:20px;height:20px;fill:#ffffff}
 #toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:#17130c;color:#fff;font-size:13.5px;font-weight:800;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:30;white-space:nowrap}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.peekband{position:relative;height:70px;background:#fff9ef;border-bottom:2px solid #17130c;margin:-12px -14px 8px;flex:none}
-.peekimg{position:absolute;right:14px;bottom:-13px;width:86px;pointer-events:none;animation:peekbob 3.4s ease-in-out infinite}
+.peekimg{position:absolute;right:12px;top:-62px;width:86px;pointer-events:none;animation:peekbob 3.4s ease-in-out infinite;z-index:4}
 @keyframes peekbob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 .btnrow{display:flex;gap:8px;margin:12px -14px -16px;padding:10px 14px 14px;background:#ffffff;border-top:1.5px solid #f0e4d0;position:sticky;bottom:-16px;z-index:5}
 .btn{flex:1;text-align:center;border-radius:12px;padding:15px 0;font-weight:800;font-size:16px;cursor:pointer;text-decoration:none;display:block;font-family:inherit}
@@ -231,7 +230,7 @@ function render(){ syncArea();
     var sh = SHOPS[s.shop];
     var nz2 = ' nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4);
     var top2 = sh.img ? '<img src="'+PH[sh.img]+'" style="width:100%;height:118px;object-fit:cover;border-radius:12px">' : (sh.ph ? '<img src="'+PHB+sh.ph[0]+'" style="width:100%;height:118px;object-fit:cover;border-radius:12px">' + (sh.ph.length > 1 ? '<div class="dthumbs">' + sh.ph.slice(1).map(function(f){ return '<img src="'+PHB+f+'">'; }).join('') + '</div>' : '') : '<div class="noimg'+nz2+'" style="height:92px;border-radius:12px">'+sh.g+'（写真は準備中）</div>');
-    h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;display:flex;flex-direction:column;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><div class="peekband"><button class="backbtn" style="top:14px;left:10px" onclick="go(\'results\')">← もどる</button><img class="peekimg" src="assets/peek.webp?v=53" alt=""></div><div style="position:relative">' + top2 + '<button class="sharefab" onclick="shareShop()" aria-label="シェア"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.4 3.4-1.5 1.5-1-1v6.1h-1.8V6.4l-1 1L8.6 5.9zM5 11.5h3.6v2H7v6.1h10v-6.1h-1.6v-2H19V22H5z" transform="translate(0,-0.5)"/></svg></button></div>'
+    h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;display:flex;flex-direction:column;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><button class="backbtn" style="top:10px;left:10px" onclick="go(\'results\')">← もどる</button><div style="position:relative;margin-top:64px">' + top2 + '<img class="peekimg" src="assets/peek.webp?v=53" alt=""><button class="sharefab" onclick="shareShop()" aria-label="シェア"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.4 3.4-1.5 1.5-1-1v6.1h-1.8V6.4l-1 1L8.6 5.9zM5 11.5h3.6v2H7v6.1h10v-6.1h-1.6v-2H19V22H5z" transform="translate(0,-0.5)"/></svg></button></div>'
       + '<div style="font-weight:800;font-size:18px;margin-top:7px;color:#111">'+sh.n+'</div>'
       + '<div class="scores">'
       + (sh.gs ? '<span class="sc g">Google ★'+sh.gs+'（'+sh.gc+'件）</span>' : '')
