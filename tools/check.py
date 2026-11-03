@@ -76,6 +76,7 @@ ok("peekback" in html and "peekfront" in html and "assets/peek.webp" in html and
 ok("clip-path" not in html, "no clip-path (iOS misrender)")
 ok("shareShop" in html and "makePoster" in html and "sharefab" in html, "share poster feature present")
 ok("prepPoster" in html and "posterwrap" in html and "openPosterPreview" in html, "poster pre-generated + preview save path")
+ok("gmapbtn" in html and "initGMap" in html and "maps.googleapis.com" in html and "showMapCard" in html, "map screen + top-right entry wired")
 ok("qrcode=function" in html and "drawQR" in html, "QR library inlined for poster")
 ok("[?&]s=" in html and "shopUrl" in html, "shop deep link (?s=area-id) wired")
 ok(os.path.exists(ROOT + "/assets/peek.webp"), "asset exists: peek.webp")
