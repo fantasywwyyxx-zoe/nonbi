@@ -72,9 +72,19 @@ if(!window.hatchWidget){
 .kv{font-size:14px;line-height:1.6;color:#111;margin-top:4px}.krow{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1e5cd}.krow:last-child{border-bottom:none}.krow b{flex:0 0 42px;color:#8a6d3f;font-weight:800}.krow span{flex:1;min-width:0}
 .sharefab{position:absolute;right:10px;bottom:10px;width:42px;height:42px;border-radius:50%;background:#17130c;border:2px solid #fff9ef;box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;padding:0}
 .sharefab svg{width:20px;height:20px;fill:#ffffff}
-#toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:#17130c;color:#fff;font-size:13.5px;font-weight:800;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:30;white-space:nowrap}
+#posterwrap{position:absolute;inset:0;background:rgba(23,19,12,.55);z-index:40;display:flex;align-items:center;justify-content:center}
+.pbox{background:#fff;border-radius:18px;padding:14px;width:86%;max-width:330px;text-align:center;max-height:92%;overflow-y:auto}
+.pbox img{width:100%;border-radius:10px}
+.pload{font-weight:800;color:#8a6d3f;padding:44px 0}
+.phint{font-size:12px;color:#8a6d3f;font-weight:700;margin:9px 0}
+.prow2{display:flex;gap:8px}
+.pbtn{flex:1;padding:12px 0;border-radius:10px;border:1.8px solid #17130c;background:#fff;font-family:inherit;font-weight:800;font-size:14.5px;cursor:pointer;color:#17130c}
+.pbtn.main{background:#17130c;color:#fff}
+.pcancel2{margin-top:9px;background:none;border:none;font-family:inherit;font-weight:700;color:#888;font-size:13.5px;cursor:pointer}
+#toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:#17130c;color:#fff;font-size:13.5px;font-weight:800;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:50;white-space:nowrap}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.peekimg{position:absolute;right:12px;top:-62px;width:86px;pointer-events:none;animation:peekbob 3.4s ease-in-out infinite;z-index:4}
+.peekback{position:absolute;right:12px;top:-50px;width:86px;pointer-events:none;animation:peekbob 3.4s ease-in-out infinite;z-index:1}
+.peekfront{position:absolute;right:12px;top:-50px;width:86px;pointer-events:none;animation:peekbob 3.4s ease-in-out infinite;z-index:3;clip-path:inset(74% 0 0 0)}
 @keyframes peekbob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 .btnrow{display:flex;gap:8px;margin:12px -14px -16px;padding:10px 14px 14px;background:#ffffff;border-top:1.5px solid #f0e4d0;position:sticky;bottom:-16px;z-index:5}
 .btn{flex:1;text-align:center;border-radius:12px;padding:15px 0;font-weight:800;font-size:16px;cursor:pointer;text-decoration:none;display:block;font-family:inherit}
@@ -230,7 +240,7 @@ function render(){ syncArea();
     var sh = SHOPS[s.shop];
     var nz2 = ' nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4);
     var top2 = sh.img ? '<img src="'+PH[sh.img]+'" style="width:100%;height:118px;object-fit:cover;border-radius:12px">' : (sh.ph ? '<img src="'+PHB+sh.ph[0]+'" style="width:100%;height:118px;object-fit:cover;border-radius:12px">' + (sh.ph.length > 1 ? '<div class="dthumbs">' + sh.ph.slice(1).map(function(f){ return '<img src="'+PHB+f+'">'; }).join('') + '</div>' : '') : '<div class="noimg'+nz2+'" style="height:92px;border-radius:12px">'+sh.g+'（写真は準備中）</div>');
-    h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;display:flex;flex-direction:column;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><button class="backbtn" style="top:10px;left:10px" onclick="go(\'results\')">← もどる</button><div style="position:relative;margin-top:64px">' + top2 + '<img class="peekimg" src="assets/peek.webp?v=53" alt=""><button class="sharefab" onclick="shareShop()" aria-label="シェア"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.4 3.4-1.5 1.5-1-1v6.1h-1.8V6.4l-1 1L8.6 5.9zM5 11.5h3.6v2H7v6.1h10v-6.1h-1.6v-2H19V22H5z" transform="translate(0,-0.5)"/></svg></button></div>'
+    h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;display:flex;flex-direction:column;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><button class="backbtn" style="top:10px;left:10px" onclick="go(\'results\')">← もどる</button><div style="position:relative;margin-top:64px"><img class="peekback" src="assets/peek.webp?v=53" alt=""><div style="position:relative;z-index:2">' + top2 + '</div><img class="peekfront" src="assets/peek.webp?v=53" alt=""><button class="sharefab" style="z-index:5" onclick="shareShop()" aria-label="シェア"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.4 3.4-1.5 1.5-1-1v6.1h-1.8V6.4l-1 1L8.6 5.9zM5 11.5h3.6v2H7v6.1h10v-6.1h-1.6v-2H19V22H5z" transform="translate(0,-0.5)"/></svg></button></div>'
       + '<div style="font-weight:800;font-size:18px;margin-top:7px;color:#111">'+sh.n+'</div>'
       + '<div class="scores">'
       + (sh.gs ? '<span class="sc g">Google ★'+sh.gs+'（'+sh.gc+'件）</span>' : '')
@@ -254,6 +264,7 @@ function render(){ syncArea();
       + '<button class="pcancel" onclick="setPick(false)">キャンセル</button></div></div>';
   }
   ui.innerHTML = h;
+  if(s.screen==='detail'){ prepPoster(); }
   if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=720)?250:Math.min(220,H*0.36); var bt=(H>=720)?H*0.235:142; hs.style.top=(bt+bw*1.3327+16)+'px'; } }
 }
 function save(){ window.hatchWidget.setState(window.__S); }
@@ -352,17 +363,34 @@ async function makePoster(sh, url){
   drawQR(ctx, url, 876, 1196, 128);
   return new Promise(function(res){ cv.toBlob(function(b){ res(b ? new File([b], 'nonbi-poster.png', {type: 'image/png'}) : null); }, 'image/png'); });
 }
+var __posterFile = null, __posterKey = '';
+function prepPoster(){ var sh = SHOPS[window.__S.shop]; if(!sh) return; var key = AREAKEY + '-' + sh.id; if(__posterKey === key) return; __posterKey = key; __posterFile = null; makePoster(sh, shopUrl(sh)).then(function(f){ if(__posterKey === key) __posterFile = f; }).catch(function(){}); }
 async function shareShop(){
   var sh = SHOPS[window.__S.shop]; if(!sh) return; sndTap();
-  var url = shopUrl(sh); var file = null;
-  try{ file = await makePoster(sh, url); }catch(e){}
+  var key = AREAKEY + '-' + sh.id; var url = shopUrl(sh);
   var text = sh.n + '（' + areaName() + '）｜のんびーの厳選';
-  if(file && navigator.canShare && navigator.canShare({files: [file]})){ try{ await navigator.share({files: [file], title: 'のんびー', text: text + ' ' + url}); return; }catch(e){ if(e && e.name === 'AbortError') return; } }
-  if(navigator.share){ try{ await navigator.share({title: 'のんびー', text: text, url: url}); return; }catch(e){ if(e && e.name === 'AbortError') return; } }
-  if(file){ var a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = 'nonbi-' + AREAKEY + '-' + sh.id + '.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000); }
-  if(navigator.clipboard){ try{ await navigator.clipboard.writeText(url); }catch(e){} }
-  toast('リンクをコピーしました');
+  if(__posterFile && __posterKey === key && navigator.canShare && navigator.canShare({files: [__posterFile]})){ try{ await navigator.share({files: [__posterFile], title: 'のんびー', text: text + ' ' + url}); return; }catch(e){ if(e && e.name === 'AbortError') return; } }
+  openPosterPreview(sh);
 }
+function openPosterPreview(sh){
+  closePosterPreview();
+  var w = document.createElement('div'); w.id = 'posterwrap';
+  w.innerHTML = '<div class="pbox"><div class="pload" id="pload">ポスターを作ってるよ…</div><img id="pimg" style="display:none"><div class="phint">画像は長押しで写真に保存できます</div><div class="prow2"><button class="pbtn main" onclick="shareFromPreview()">シェアする</button><button class="pbtn" onclick="copyShopLink()">リンクをコピー</button></div><button class="pcancel2" onclick="closePosterPreview()">閉じる</button></div>';
+  document.getElementById('ph').appendChild(w);
+  var key = AREAKEY + '-' + sh.id;
+  function show(f){ var im = document.getElementById('pimg'); var ld = document.getElementById('pload'); if(!im || !f) return; im.src = URL.createObjectURL(f); im.style.display = 'block'; if(ld) ld.style.display = 'none'; }
+  if(__posterFile && __posterKey === key) show(__posterFile);
+  else { __posterKey = key; makePoster(sh, shopUrl(sh)).then(function(f){ __posterFile = f; show(f); }).catch(function(){ var ld = document.getElementById('pload'); if(ld) ld.textContent = 'ごめん、作れなかった…'; }); }
+}
+function shareFromPreview(){
+  var sh = SHOPS[window.__S.shop]; if(!sh) return; var url = shopUrl(sh);
+  var text = sh.n + '（' + areaName() + '）｜のんびーの厳選';
+  if(__posterFile && navigator.canShare && navigator.canShare({files: [__posterFile]})){ navigator.share({files: [__posterFile], title: 'のんびー', text: text + ' ' + url}).catch(function(){}); return; }
+  if(navigator.share){ navigator.share({title: 'のんびー', text: text, url: url}).catch(function(){}); return; }
+  copyShopLink();
+}
+function copyShopLink(){ var sh = SHOPS[window.__S.shop]; if(!sh) return; var url = shopUrl(sh); if(navigator.clipboard) navigator.clipboard.writeText(url).then(function(){ toast('リンクをコピーしました'); }).catch(function(){ toast(url); }); else toast(url); }
+function closePosterPreview(){ var w = document.getElementById('posterwrap'); if(w) w.remove(); }
 window.addEventListener('hatch-widget-state', function(e){ window.__S = e.detail.state; render(); });
 window.__S = window.hatchWidget.getState(DEF);
 (function(){ try{ var m = /[?&]s=([a-z]+)-(\d+)/.exec(location.search) || /#s=([a-z]+)-(\d+)/.exec(location.hash); if(m && AREAS[m[1]]){ var idx = -1; for(var i = 0; i < AREAS[m[1]].length; i++){ if(AREAS[m[1]][i].id === parseInt(m[2], 10)){ idx = i; break; } } if(idx >= 0){ window.__S.area = m[1]; window.__S.shop = idx; window.__S.screen = 'detail'; } } }catch(e){} })();
