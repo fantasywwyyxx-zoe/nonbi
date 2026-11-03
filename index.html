@@ -122,8 +122,7 @@ var SHOPS = AREAS.ike;
 function areaName(){ return AREAINFO[AREAKEY].name; }
 function syncArea(){ AREAKEY = (window.__S && AREAS[window.__S.area]) ? window.__S.area : 'ike'; SHOPS = AREAS[AREAKEY]; }
 function setArea(k){ if(!AREAS[k]) return; var S = window.__S; S.area = k; S.screen='idle'; S.step=0; S.ans={}; S.shop=null; S.pick=false; S.order=[]; S.shown=3; syncArea(); save(); render(); }
-function tryLocate(){ var S = window.__S; if(!S || S.locTried) return; S.locTried = true; save();
-  if(!navigator.geolocation) return;
+function tryLocate(){ if(!navigator.geolocation) return; var now = Date.now(); if(window.__locTryAt && now - window.__locTryAt < 60000) return; window.__locTryAt = now;
   navigator.geolocation.getCurrentPosition(function(p){
     var la = p.coords.latitude, lo = p.coords.longitude;
     ME = {lat: la, lng: lo};
@@ -131,7 +130,7 @@ function tryLocate(){ var S = window.__S; if(!S || S.locTried) return; S.locTrie
     var near = null, nd = 1e18;
     Object.keys(AREAINFO).forEach(function(k){ if(!AREAS[k]) return; var d = d2(AREAINFO[k]); if(d < nd){ nd = d; near = k; } });
     if(near && near !== AREAKEY && window.__S.screen === 'idle') setArea(near);
-  }, function(){}, {timeout:5000, maximumAge:600000}); }
+  }, function(){}, {timeout:8000, maximumAge:300000}); }
 var QS = [
  {k:'人数', q:'何人で飲む？', opts:[['1','1人',''],['2','2人',''],['3','3〜4人',''],['5','5人以上','']]},
  {k:'予算', q:'予算はどのくらい？', opts:[['2','¥2,000',''],['3','¥3,000',''],['5','¥5,000',''],['無','気にしない','']]},
@@ -166,7 +165,7 @@ function rankShops(ans){
 }
 function havM(a, b){ if(!a || !b) return null; var dx = (a.lat - b.lat) * 111000, dy = (a.lng - b.lng) * 91000; return Math.sqrt(dx * dx + dy * dy); }
 function shopLL(sh){ return sh.ll ? {lat: sh.ll[0], lng: sh.ll[1]} : null; }
-function basePos(){ if(ME) return ME; var ai = AREAINFO[AREAKEY]; return {lat: ai.lat, lng: ai.lng}; }
+function basePos(){ return ME || null; }
 function fmtDist(m){ if(m === null) return ''; if(m < 1000) return '約' + (Math.round(m / 10) * 10) + 'm'; return '約' + (m / 1000).toFixed(1) + 'km'; }
 function orderNear(){ var bp = basePos(); return window.__S.order.slice().sort(function(x, y){ var da = havM(bp, shopLL(SHOPS[x])), db = havM(bp, shopLL(SHOPS[y])); if(da === null && db === null) return 0; if(da === null) return 1; if(db === null) return -1; return da - db; }); }
 function setSort(m){ var S = window.__S; S.sortMode = m; if(m === 'near' && !ME && navigator.geolocation){ navigator.geolocation.getCurrentPosition(function(p){ ME = {lat: p.coords.latitude, lng: p.coords.longitude}; if(window.__S.sortMode === 'near') render(); }, function(){}, {timeout: 6000, maximumAge: 600000}); } save(); render(); }
@@ -346,7 +345,7 @@ function backStep(){ sndBack(); if(window.__S.step > 0){ window.__S.step--; } el
 function editAns(){ window.__S.screen='ask'; window.__S.step=0; save(); render(); }
 function backToLastQ(){ sndBack(); window.__S.screen='ask'; window.__S.step = QS.length - 1; save(); render(); }
 function more(){ sndTap(); window.__S.shown = Math.min(15, window.__S.shown + 6); save(); render(); }
-function openShop(id){ sndOpen(); window.__S.shop=id; window.__S.screen='detail'; save(); render(); }
+function openShop(id){ sndOpen(); tryLocate(); window.__S.shop=id; window.__S.screen='detail'; save(); render(); }
 function setPick(b){ sndTap(); window.__S.pick=b; save(); render(); }
 function toast(msg){ var t = document.getElementById('toast'); if(!t){ t = document.createElement('div'); t.id = 'toast'; document.getElementById('ph').appendChild(t); } t.textContent = msg; t.classList.add('on'); setTimeout(function(){ t.classList.remove('on'); }, 2200); }
 function shopUrl(sh){ return 'https://nonbi.jp/?s=' + AREAKEY + '-' + sh.id; }
@@ -380,7 +379,7 @@ async function makePoster(sh, url){
   drawQR(ctx, url, 876, 1196, 128);
   return new Promise(function(res){ cv.toBlob(function(b){ res(b ? new File([b], 'nonbi-poster.png', {type: 'image/png'}) : null); }, 'image/png'); });
 }
-var GMK = '__GMK__', __gmap = null, __gmarkers = [], __gmReady = null;
+var GMK = 'AIzaSyD6mGiRDCQ-xEyO6dzrDhqlWFPR8S5kPmg', __gmap = null, __gmarkers = [], __gmReady = null;
 function mapArea(k){ AREAKEY = k; SHOPS = AREAS[k]; window.__S.area = k; save(); render(); }
 function loadGMaps(){ if(__gmReady) return __gmReady; __gmReady = new Promise(function(res, rej){ if(window.google && google.maps) return res(); var sc = document.createElement('script'); sc.src = 'https://maps.googleapis.com/maps/api/js?key=' + GMK + '&v=weekly'; sc.onload = function(){ res(); }; sc.onerror = function(){ rej(new Error('gm')); }; document.head.appendChild(sc); }); return __gmReady; }
 function mapFail(){ var mc = document.getElementById('mapcard'); if(mc && !__gmap) mc.innerHTML = '<div style="padding:14px 16px;text-align:center;font-weight:800;color:#8a6d3f;background:#fff;border-top:2px solid #17130c">地図を読み込めなかった…電波のいい場所でもう一度開いてみて</div>'; var el = document.getElementById('gmap'); if(el && !__gmap) el.innerHTML = '<div style="padding:34px 20px;text-align:center;font-weight:800;color:#8a6d3f">地図を読み込めなかった…</div>'; }
