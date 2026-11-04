@@ -125,7 +125,11 @@ function setLang(l){ window.__S.lang = l; save(); render(); }
 function areaName(){ return LANG() === 'en' ? AREAINFO[AREAKEY].nameE : AREAINFO[AREAKEY].name; }
 function aname(k){ return LANG() === 'en' ? AREAINFO[k].nameE : AREAINFO[k].name; }
 function syncArea(){ AREAKEY = (window.__S && AREAS[window.__S.area]) ? window.__S.area : 'ike'; SHOPS = AREAS[AREAKEY]; }
-function setArea(k){ if(!AREAS[k]) return; var S = window.__S; S.area = k; S.screen='idle'; S.step=0; S.ans={}; S.shop=null; S.pick=false; S.order=[]; S.shown=3; syncArea(); save(); render(); }
+function setArea(k){ if(!AREAS[k]) return; var S = window.__S; S.showAreas = false; S.area = k; S.screen='idle'; S.step=0; S.ans={}; S.shop=null; S.pick=false; S.order=[]; S.shown=3; syncArea(); save(); render(); }
+function toggleAreas(){ window.__S.showAreas = !window.__S.showAreas; save(); render(); }
+function pickArea(k){ window.__S.showAreas = false; if(window.__S.screen === 'map') mapArea(k); else setArea(k); }
+function nearestKey(){ if(!ME) return null; function d2(info){ var dx = (info.lat - ME.lat) * 111, dy = (info.lng - ME.lng) * 91; return dx * dx + dy * dy; } var near = null, nd = 1e18; Object.keys(AREAINFO).forEach(function(k){ if(!AREAS[k]) return; var d = d2(AREAINFO[k]); if(d < nd){ nd = d; near = k; } }); return near; }
+function locateNearest(){ sndTap(); if(ME){ var k0 = nearestKey(); if(k0){ setArea(k0); toast(LANG() === 'en' ? 'Nearest area: ' + areaName() : areaName() + 'が一番近いよ'); } return; } if(!navigator.geolocation){ toast(T('この端末では位置情報が使えないみたい…')); return; } toast(T('現在地を探してる…')); navigator.geolocation.getCurrentPosition(function(p){ ME = {lat: p.coords.latitude, lng: p.coords.longitude}; var k = nearestKey(); if(k){ setArea(k); toast(LANG() === 'en' ? 'Nearest area: ' + areaName() : areaName() + 'が一番近いよ'); } }, function(){ toast(T('現在地が取れなかった…端末の位置情報の設定を確認してね')); }, {timeout: 8000, maximumAge: 300000}); }
 function tryLocate(){ if(!navigator.geolocation) return; var now = Date.now(); if(window.__locTryAt && now - window.__locTryAt < 60000) return; window.__locTryAt = now;
   navigator.geolocation.getCurrentPosition(function(p){
     var la = p.coords.latitude, lo = p.coords.longitude;
@@ -139,6 +143,7 @@ var QS = [
  {k:'人数', q:'何人で飲む？', opts:[['1','1人',''],['2','2人',''],['3','3〜4人',''],['5','5人以上','']]},
  {k:'予算', q:'予算はどのくらい？', opts:[['2','¥2,000',''],['3','¥3,000',''],['5','¥5,000',''],['無','気にしない','']]},
  {k:'飲み放題', q:'飲み放題は？', opts:[['放','あった方がいい',''],['単','なくてもいい','']]},
+ {k:'喫煙', q:'タバコは？', opts:[['禁','禁煙がいい',''],['吸','吸いたい',''],['無','気にしない','']]},
  {k:'雰囲気', q:'どんな雰囲気がいい？', opts:[['洒','おしゃれ',''],['静','静か',''],['賑','にぎやか',''],['渋','渋い老舗','']]},
  {k:'お酒', q:'何が飲みたい？', opts:[['梅','梅酒',''],['酒','日本酒',''],['ウ','ウイスキー',''],['麦','ビール',''],['葡','ワイン',''],['何','何でも','']]},
  {k:'おつまみ', q:'おつまみは、どんなのがいい？', opts:[['肉','肉系','焼きとん・焼き鳥'],['魚','海鮮','刺身・寿司'],['揚','揚げ物','天ぷら・串カツ'],['菜','野菜','サラダ系'],['締','締め','蕎麦・麺'],['何','何でも','']]},
@@ -152,6 +157,8 @@ var EN = {
 '何人で飲む？':'How many people?','1人':'Just me','2人':'2 people','3〜4人':'3-4 people','5人以上':'5+ people',
 '予算はどのくらい？':"What's your budget?",'気にしない':"Don't care",
 '飲み放題は？':'All-you-can-drink?','あった方がいい':'Yes, please','なくてもいい':'Not needed',
+'タバコは？':'Smoking?','禁煙がいい':'Non-smoking please','吸いたい':'I want to smoke',
+'禁煙':'Non-smoking','喫煙可':'Smoking OK','分煙':'Separated areas',
 'どんな雰囲気がいい？':'What kind of vibe?','おしゃれ':'Stylish','静か':'Quiet','にぎやか':'Lively','渋い老舗':'Old-school classic',
 '何が飲みたい？':'What are you drinking?','梅酒':'Umeshu (plum wine)','日本酒':'Sake','ウイスキー':'Whisky','ビール':'Beer','ワイン':'Wine','何でも':'Anything',
 'おつまみは、どんなのがいい？':'What kind of snacks?','肉系':'Meaty','焼きとん・焼き鳥':'Grilled pork & yakitori','海鮮':'Seafood','刺身・寿司':'Sashimi & sushi','揚げ物':'Fried food','天ぷら・串カツ':'Tempura & kushikatsu','野菜':'Veggies','サラダ系':'Salads & light bites','締め':'Finishing dish','蕎麦・麺':'Soba & noodles',
@@ -168,12 +175,22 @@ var EN = {
 '地図を読み込めなかった…電波のいい場所でもう一度開いてみて':'Could not load the map… try again somewhere with a better signal','地図を読み込めなかった…':'Could not load the map…',
 'この端末では位置情報が使えないみたい…':'Location is not available on this device…','現在地を探してる…':'Finding your location…',
 '地図がまだ読み込み中…もう一度押してね':'The map is still loading… tap again in a moment','現在地が取れなかった…端末の位置情報の設定を確認してね':'Could not get your location… check your location settings',
-'くわしく':'Details'};
+'くわしく':'Details','現在地から探す':'Use my location','エリアを選ぶ':'Choose an area'};
 var GEN_EN = {'居酒屋':'Izakaya','焼き鳥':'Yakitori','焼鳥':'Yakitori','もつ焼き':'Motsuyaki','やきとん':'Yakiton','バー':'Bar','立ち飲み':'Standing bar','日本酒バー':'Sake bar','日本酒専門店':'Sake specialty shop','焼酎バー':'Shochu bar','ビアバー':'Beer bar','ビアホール':'Beer hall','ワインバー':'Wine bar','海鮮':'Seafood','海鮮居酒屋':'Seafood izakaya','寿司':'Sushi','そば':'Soba','蕎麦':'Soba','そば居酒屋':'Soba izakaya','小料理':'Small-dish restaurant','小料理屋':'Small-dish restaurant','割烹':'Kappo','炉端焼き':'Robatayaki','ろばた焼き':'Robatayaki','炭火焼':'Charcoal grill','炭火焼き':'Charcoal grill','鉄板焼':'Teppanyaki','鉄板焼き':'Teppanyaki','餃子':'Gyoza','おでん':'Oden','串焼き':'Grilled skewers','串揚げ':'Fried skewers','天ぷら':'Tempura','角打ち':'Kakuuchi standing bar','大衆酒場':'Casual tavern','酒場':'Tavern','食堂':'Diner','定食':'Set meals','中華料理':'Chinese','町中華':'Local Chinese','イタリアン':'Italian','イタリア':'Italian','フレンチ':'French','スペイン料理':'Spanish','スペインバル':'Spanish bar','タイ料理':'Thai','沖縄料理':'Okinawan','郷土料理':'Regional dishes','鍋':'Hot pot','もつ鍋':'Motsu hot pot','しゃぶしゃぶ':'Shabu-shabu','焼肉':'Yakiniku','ホルモン':'Horumon (offal)','牛タン':'Beef tongue','馬肉料理':'Horse meat','鳥料理':'Chicken dishes','鶏料理':'Chicken dishes','日本料理':'Japanese','和食':'Japanese','洋食':'Western-style','洋風居酒屋':'Western-style izakaya','ビストロ':'Bistro','ダイニングバー':'Dining bar','パブ':'Pub','カフェ':'Cafe','カフェバー':'Cafe bar','スタンディングバー':'Standing bar','ウイスキーバー':'Whisky bar','オイスターバー':'Oyster bar','ジャズバー':'Jazz bar','ミュージックバー':'Music bar','スポーツバー':'Sports bar','バル':'Bar','レストラン':'Restaurant','ラーメン':'Ramen','うどん':'Udon','その他':'Other','創作料理':'Creative cuisine','ステーキ':'Steak','ハンバーガー':'Burgers','ピザ':'Pizza','パスタ':'Pasta','デリ':'Deli','ビュッフェ':'Buffet','ビアガーデン':'Beer garden','日本酒バル':'Sake bar','日本酒':'Sake','焼酎':'Shochu','からあげ':'Karaage','とんかつ':'Tonkatsu','うなぎ':'Unagi (eel)','かに':'Crab','かき':'Oysters','ふぐ料理':'Fugu','どじょう':'Loach','くじら料理':'Whale dishes','あんこう':'Anglerfish','手羽先':'Chicken wings','親子丼':'Oyakodon','牛丼':'Beef bowl','牛カツ':'Beef cutlet','水炊き':'Mizutaki','明石焼き':'Akashiyaki','たこ焼き':'Takoyaki','お好み焼き':'Okonomiyaki','天丼':'Tendon','海鮮丼':'Seafood bowl','点心':'Dim sum','飲茶':'Dim sum','小籠包':'Soup dumplings','肉料理':'Meat dishes','肉バル':'Meat bar','豚料理':'Pork dishes','豚しゃぶ':'Pork shabu','牛肉料理':'Beef dishes','牛料理':'Beef dishes','魚料理':'Fish dishes','野菜料理':'Vegetable dishes','鳥すき焼き':'Chicken sukiyaki','馬肉専門居酒屋':'Horse-meat izakaya','立ち食い寿司':'Standing sushi','寿司バー':'Sushi bar','日本酒専門':'Sake specialty','ジン専門店':'Gin specialty shop','シガーバー':'Cigar bar','ドイツ料理':'German','インド料理':'Indian','メキシコ料理':'Mexican','ベトナム料理':'Vietnamese','ヨーロッパ料理':'European','九州料理':'Kyushu dishes','台湾料理':'Taiwanese','イノベーティブ':'Innovative','オーガニック':'Organic','ジビエ料理':'Game meat','均一価格':'Flat-price','酒販店':'Sake shop','売店':'Shop','川魚料理':'River fish','惣菜':'Deli','地酒':'Local sake'};
 var TAG_EN = {'おしゃれ':'Stylish','おしゃれな空間':'Stylish space','静か':'Quiet','静かに飲める':'Quiet drinks','静かなカウンターバー':'Quiet counter bar','しっぽり':'Intimate & calm','にぎやか':'Lively','賑やか':'Lively','活気がある':'Lively buzz','活気':'Lively','落ち着いた':'Calm','落ち着いた空間':'Calm space','落ち着いた雰囲気':'Calm vibe','落ち着いた大人の酒場':'Calm, grown-up tavern','隠れ家':'Hidden gem','隠れ家バー':'Hidden bar','隠れ家的':'Hideaway feel','老舗':'Long-established','大衆酒場':'Casual tavern','カウンター席あり':'Counter seats','カウンターのみ':'Counter only','カウンター中心':'Counter-focused','カウンター':'Counter','テーブル席あり':'Table seats','個室あり':'Private rooms','半個室あり':'Semi-private rooms','テラス席あり':'Terrace seats','テラス席':'Terrace seats','オープンテラスあり':'Open terrace','立ち飲み':'Standing bar','立ち飲み専門':'Standing only','立ち飲みができる':'Standing available','一人飲み歓迎':'Solo-friendly','おひとりさまOK':'Solo OK','おひとり様歓迎':'Solo welcome','一人で入りやすい':'Easy to enter solo','一人飲みしやすい':'Solo-friendly','一人飲み向き':'Good for solo drinks','デート':'Date spot','デート向き':'Good for dates','宴会向き':'Good for parties','宴会向け':'Good for parties','大人数OK':'Big groups OK','大人数可':'Big groups OK','全席禁煙':'Non-smoking','全席喫煙可':'Smoking allowed','禁煙':'Non-smoking','完全禁煙':'Fully non-smoking','分煙':'Separate smoking areas','喫煙可':'Smoking OK','飲み放題あり':'All-you-can-drink','飲み比べ':'Tasting sets','ハッピーアワー':'Happy hour','ハッピーアワーあり':'Happy hour','朝飲み可':'Morning drinks','朝飲みOK':'Morning drinks OK','昼飲み可':'Daytime drinks','昼飲みOK':'Daytime drinks OK','深夜営業':'Open late','深夜OK':'Open late','終電後OK':'Open past the last train','クラフトビール':'Craft beer','日本酒にこだわる':'Serious about sake','日本酒にこだわる店':'Serious about sake','日本酒充実':'Great sake selection','日本酒専門':'Sake specialty','焼酎にこだわる':'Serious about shochu','ワインにこだわる店':'Serious about wine','ソムリエがいる':'Sommelier on site','ソムリエがいる店':'Sommelier on site','古民家':'Old folk house','古民家風':'Folk-house style','和モダン':'Modern Japanese','昭和レトロ':'Showa retro','昭和':'Showa era','下町情緒':'Old-town charm','夜景':'Night view','夜景が見える':'Night view','眺望が良い':'Great view','駅近':'Near the station','駅直結':'Directly connected to the station','高架下':'Under the tracks','ガード下':'Under the tracks','カジュアル':'Casual','アットホーム':'Homey','アットホームな空間':'Homey space','上質':'Upscale','大人の空間':'Grown-up space','大人の隠れ家':'Grown-up hideaway','大人のバル':'Grown-up bar','開放的':'Open & airy','窓際席':'Window seats','現金のみ':'Cash only','完全キャッシュレス':'Cashless only','キャッシュオン':'Cash on delivery','予約必須の人気店':'Popular — booking essential','予約推奨の人気店':'Popular — booking advised','常に満席の人気店':'Always packed','生演奏あり':'Live music','ライブ・生演奏あり':'Live music','ジャズ':'Jazz','ボトルキープ可':'Bottle keep OK','ペット可':'Pets OK','ペット可':'Pets OK','シガー可':'Cigars OK','葉巻可':'Cigars OK','ルーフトップ':'Rooftop','ロフト席あり':'Loft seats','座敷あり':'Tatami rooms','掘りごたつあり':'Sunken kotatsu','オープンキッチン':'Open kitchen','一軒家':'Detached house','地下の隠れ家':'Basement hideaway','路地裏の隠れ家':'Alley hideaway','路地の奥の隠れ家':'Alley hideaway','炭火焼':'Charcoal grill','備長炭':'Binchotan charcoal','手打ち蕎麦':'Handmade soba','手作り料理':'Homemade dishes','刺身盛り合わせが名物':'Famous sashimi platters','舟盛り刺身':'Boat sashimi platter','生け簀あり':'Live fish tank','地元密着':'Local favorite','地酒充実':'Great local sake','仕事帰りの一杯':'After-work drink','女子会向き':'Good for girls\' nights','接待向き':'Good for business dinners','夫婦経営の隠れ家ビストロ':'Couple-run hideaway bistro','モダン':'Modern','和風':'Japanese style','木の温もり':'Warm wood interior','せんべろ':'Senbero (cheap drinks)','サク飲み向き':'Quick-drink friendly','早めの時間向き（21時閉店）':'Early hours (closes 21:00)','完全予約制':'Reservation only','会員制（初回は公式サイトから予約必須':'Members only','ミシュラン・ビブグルマン掲載歴':'Michelin Bib Gourmand listed','オープンテラス席あり':'Open-terrace seats','ソファー席あり':'Sofa seats','バーカウンターあり':'Bar counter','ビアホール':'Beer hall','ワインバル':'Wine bar','パブ':'Pub','ブリティッシュパブ':'British pub','オーセンティックバー':'Authentic bar','ネオ居酒屋':'Neo-izakaya','大箱':'Spacious','小さな隠れ家':'Tiny hideaway','小さな店内（20席）':'Small space (20 seats)','路地裏の小体な隠れ家居酒屋':'Small alley hideaway izakaya','入口が分かりにくい隠れ家':'Hard-to-find entrance hideaway','地下の店内':'Basement interior','2フロア':'Two floors','一枚板カウンター6席＋テーブル14席':'Single-plank counter','季節のフルーツカクテル':'Seasonal fruit cocktails','自然派ワイン':'Natural wine','ナチュラルワイン':'Natural wine','フランスワイン':'French wine','日本ワイン専門':'Japanese wine specialty','ベルギービール専門':'Belgian beer specialty','ビール好きが集まる専門店':'Beer-lovers\' spot','ウイスキー専門':'Whisky specialty','ウイスキー中心':'Whisky-focused','ジン専門':'Gin specialty','ラム酒専門':'Rum specialty','日本酒好きが集まる専門店':'Sake-lovers\' spot','海鮮居酒屋':'Seafood izakaya','海鮮立ち飲み発祥':'Birthplace of standing seafood bars','まぐろ特化':'Tuna specialist','いわし料理専門':'Sardine specialist','もつ焼き専門':'Motsuyaki specialist','やきとん専門, 金宮, 梅割り, もつ煮込み, 大衆酒場':'Yakiton specialist','おでん専門':'Oden specialist','馬肉専門':'Horse-meat specialist','手打ち蕎麦あり':'Handmade soba','串焼き':'Grilled skewers','串揚げ':'Fried skewers','炉端焼き':'Robatayaki','原始焼き':'Genshiyaki grill','角打ち':'Kakuuchi','角打ちスタイル':'Kakuuchi style','そば飲み':'Soba & drinks','お通しなし':'No otoshi charge','お通し・チャージなし':'No otoshi / no cover','チャージなし':'No cover charge','チャージ料なし':'No cover charge','完全個室あり':'Fully private rooms','全席個室':'All private rooms','全室個室':'All private rooms','貸切可':'Private hire OK','相席あり':'Shared tables','グループ店の安定感':'Reliable chain quality','店頭立ち飲み':'Storefront standing drinks','井の頭公園前':'In front of Inokashira Park','公園ビュー':'Park view','東京タワーを望む夜景':'Tokyo Tower night view','地上200mのパノラマ':'Panorama from 200m up','ホテル地下':'Hotel basement','ホテルライク':'Hotel-like','船内風インテリア':'Ship-style interior','英国パブ風の地下空間':'British-pub basement','アールデコ調の内装':'Art Deco interior','ガラス張りの開放的な空間':'Glass-walled open space','綺麗でおしゃれな店内（ホットペッパー口コミより）':'Clean, stylish interior','明るく清潔な店内で':'Bright & clean','家庭的な雰囲気':'Homey vibe','女将のおまかせコース':'Okami\'s omakase course','ライブ・生演奏あり':'Live music','客も演奏できる':'Guests can play too','映画ファンが集まる':'Movie-fan hangout','クイズを楽しむコンセプトバー':'Quiz concept bar','唯一無二のコンセプトバー':'One-of-a-kind concept bar','プラネタリウムの星空':'Planetarium starry sky','ミラーボールのイベントあり':'Mirror-ball events','ダーツあり':'Darts','スポーツ観戦可':'Sports viewing OK','シミュレーションゴルフ併設':'Golf simulator inside','グランドピアノ':'Grand piano'};
 function dispG(sh){ if(LANG() !== 'en') return sh.g; return sh.g.split(/[、・]/).map(function(t){ t = t.trim(); if(!t) return ''; var head = t.replace(/（.*$/, '').replace(/\(.*$/, '').trim(); return GEN_EN[head] || GEN_EN[t] || t; }).filter(Boolean).join(', '); }
 function dispTags(sh){ var ts = sh.tags.slice(0, 4); if(LANG() !== 'en') return ts.join('・'); return ts.map(function(t){ return TAG_EN[t] || t; }).join(' · '); }
 
+function smokeKind(sh){
+  var txt = sh.tags.join(' ') + ' ' + (sh.w || '') + ' ' + (sh.s || '');
+  var sm = /全席喫煙可|喫煙可|喫煙OK|全面喫煙可|喫煙目的/.test(txt);
+  var ns = /全席禁煙|完全禁煙|禁煙/.test(txt) && !sm;
+  var sep = /分煙/.test(txt);
+  if(sep && !ns && !sm) return 'sep';
+  if(ns) return 'ns';
+  if(sm) return 'sm';
+  return '';
+}
 function budgetMin(b){ var m = (b||'').replace(/,/g,'').match(/¥\s*(\d+)/); return m ? parseInt(m[1]) : 3000; }
 function score(sh, ans){
   var sc = 0, txt = (sh.tags.join(' ') + ' ' + sh.s + ' ' + sh.g + ' ' + sh.n);
@@ -182,11 +199,14 @@ function score(sh, ans){
   (MOOD[ans['雰囲気']]||[]).forEach(function(w){ if(txt.indexOf(w)>=0) sc += 3; });
   (PPL[ans['人数']]||[]).forEach(function(w){ if(txt.indexOf(w)>=0) sc += 1; });
   var blim = {'¥2,000':2000,'¥3,000':3000,'¥5,000':5000}[ans['予算']];
-  if(blim){ var bm = budgetMin(sh.b); if(bm <= blim) sc += 2; else if(bm <= blim + 1500) sc += 0.5; }
+  if(blim){ var bm = budgetMin(sh.b); if(bm <= blim) sc += 2; else if(bm <= blim + 1500) sc -= 1; else sc -= 6; }
   if(sh.ts) sc += (parseFloat(sh.ts) - 3.3) * 2;
   if(sh.gs) sc += (parseFloat(sh.gs) - 4.0) * 2;
   if(ans['飲み放題']==='あった方がいい'){ if(txt.indexOf('飲み放題')>=0) sc += 4; else sc -= 1.5; }
   if(ans['酔い']==='ベロベロ' && /深夜|朝飲み|24時間/.test(sh.h + sh.tags.join(''))) sc += 1;
+  var sk = smokeKind(sh);
+  if(ans['喫煙']==='禁煙がいい'){ if(sk==='ns') sc += 3; else if(sk==='sep') sc += 1; else if(sk==='sm') sc -= 3; }
+  if(ans['喫煙']==='吸いたい'){ if(sk==='sm') sc += 3; else if(sk==='sep') sc += 1.5; else if(sk==='ns') sc -= 2; }
   return sc;
 }
 function rankShops(ans){
@@ -199,7 +219,7 @@ function basePos(){ return ME || null; }
 function fmtDist(m){ if(m === null) return ''; if(m < 1000) return T('約') + (Math.round(m / 10) * 10) + 'm'; return T('約') + (m / 1000).toFixed(1) + 'km'; }
 function orderNear(){ var bp = basePos(); return window.__S.order.slice().sort(function(x, y){ var da = havM(bp, shopLL(SHOPS[x])), db = havM(bp, shopLL(SHOPS[y])); if(da === null && db === null) return 0; if(da === null) return 1; if(db === null) return -1; return da - db; }); }
 function setSort(m){ var S = window.__S; S.sortMode = m; if(m === 'near' && !ME && navigator.geolocation){ navigator.geolocation.getCurrentPosition(function(p){ ME = {lat: p.coords.latitude, lng: p.coords.longitude}; if(window.__S.sortMode === 'near') render(); }, function(){}, {timeout: 6000, maximumAge: 600000}); } save(); render(); }
-var DEF = {screen:'idle', step:0, ans:{}, shop:null, pick:false, order:[], shown:3, area:'ike', locTried:false, sortMode:'rec'};
+var DEF = {screen:'idle', step:0, ans:{}, shop:null, pick:false, order:[], shown:3, area:'ike', locTried:false, sortMode:'rec', showAreas:false};
 function mapUrl(kind, q){
   var e = encodeURIComponent(q);
   if(kind==='google') return 'https://www.google.com/maps/search/?api=1&query='+e;
@@ -212,6 +232,7 @@ function badges(sh){
   if(sh.gs) h += '<span class="sc g">G ★'+sh.gs+'</span>';
   if(sh.ts) h += '<span class="sc t">' + (LANG() === 'en' ? 'Tabelog ' : '食 ') + sh.ts + '</span>';
   if((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0) h += '<span class="sc n">' + T('飲み放題あり') + '</span>';
+  var skb = smokeKind(sh); if(skb) h += '<span class="sc k">' + T(skb === 'ns' ? '禁煙' : (skb === 'sm' ? '喫煙可' : '分煙')) + '</span>';
   var dm = havM(basePos(), shopLL(sh)); if(dm !== null) h += '<span class="sc d">' + fmtDist(dm) + '</span>';
   return h;
 }
@@ -244,8 +265,9 @@ function render(){ syncArea();
   var s = window.__S, ui = document.getElementById('ui'), h = '';
   if(s.screen==='idle'){
     setBot('sz-idle', 'idle');
-    h = '<img class="brandlogo" src="assets/logo.png?v=42" alt="のんびー"><div class="areaSwitch">' + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ return '<button class="asw' + (AREAKEY===k ? ' on' : '') + '" onclick="setArea(\'' + k + '\')">' + aname(k) + '</button>'; }).join('') + '</div>'
+    h = '<img class="brandlogo" src="assets/logo.png?v=42" alt="のんびー"><div class="areaDrop"><button class="adbtn" onclick="toggleAreas()"><span>📍</span>' + areaName() + '<span class="adcaret">▾</span></button></div>'
       + '<div class="say" id="homesay" style="font-size:20.5px;letter-spacing:.05em">' + (LANG() === 'en' ? 'Tonight\'s first round, <span class="hl">leave it to me</span>' : '今夜の一杯、<span class="hl">まかせて</span>') + '</div>'
+      + '<button class="locbtn" onclick="locateNearest()">◎ ' + T('現在地から探す') + '</button>'
       + '<button class="pillbtn" style="bottom:52px" onclick="go(\'ask\')">' + T('はじめる') + '</button><div class="langSwitch"><button class="lsw' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語</button><button class="lsw' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">EN</button></div>'
       + '';
   } else if(s.screen==='ask'){
@@ -275,7 +297,7 @@ function render(){ syncArea();
     h = '<div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#fff9ef">'
       + '<div style="flex:none;padding:12px 12px 9px">'
       + '<div style="display:flex;align-items:center;gap:10px"><button class="backbtn" style="position:static;flex:none" onclick="go(\'idle\')">' + T('← もどる') + '</button><div style="font-weight:900;font-size:18px">' + T('厳選マップ') + '</div><div style="font-size:12px;color:#96793f;font-weight:700">' + SHOPS.filter(function(x){ return x.ll; }).length + T('軒') + '</div></div>'
-      + '<div class="areaSwitch">' + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ return '<button class="asw' + (AREAKEY===k ? ' on' : '') + '" onclick="mapArea(\'' + k + '\')">' + aname(k) + '</button>'; }).join('') + '</div></div>'
+      + '<div style="margin-top:8px"><button class="adbtn" onclick="toggleAreas()"><span>📍</span>' + areaName() + '<span class="adcaret">▾</span></button></div></div>'
       + '<div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column"><div id="gmap" style="flex:1;min-height:0;position:relative;background:#e9e2d2"></div><button onclick="locateOnMap()" style="position:absolute;right:12px;bottom:14px;z-index:5;background:#fff;color:#17130c;border:2px solid #17130c;border-radius:999px;padding:9px 15px;font-weight:900;font-size:14px;box-shadow:0 3px 10px rgba(0,0,0,.25)">' + T('◎ 現在地') + '</button></div>'
       + '<div id="mapcard"></div></div>';
   } else if(s.screen==='detail'){
@@ -288,7 +310,7 @@ function render(){ syncArea();
       + '<div class="scores">'
       + (sh.gs ? '<span class="sc g">Google ★'+sh.gs+(LANG() === 'en' ? ' ('+sh.gc+' reviews)' : '（'+sh.gc+'件）')+'</span>' : '')
       + (sh.ts ? '<span class="sc t">'+(LANG() === 'en' ? 'Tabelog ' : '食べログ ')+sh.ts+(LANG() === 'en' ? ' ('+sh.tc+' reviews)' : '（'+sh.tc+'件）')+'</span>' : '')
-      + ((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0 ? '<span class="sc n">' + T('飲み放題あり') + '</span>' : '')
+      + ((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0 ? '<span class="sc n">' + T('飲み放題あり') + '</span>' : '') + (smokeKind(sh) ? '<span class="sc k">' + T(smokeKind(sh) === 'ns' ? '禁煙' : (smokeKind(sh) === 'sm' ? '喫煙可' : '分煙')) + '</span>' : '')
       + (havM(basePos(), shopLL(sh)) !== null ? '<span class="sc d">' + fmtDist(havM(basePos(), shopLL(sh))) + '</span>' : '')
       + '</div>'
       + '<div class="kv" style="margin-top:8px"><div class="krow"><b>'+T('住所')+'</b><span>'+sh.a+'</span></div><div class="krow"><b>'+T('営業')+'</b><span>'+sh.h+'</span></div><div class="krow"><b>'+T('予算')+'</b><span>'+sh.b+'</span></div>'+(sh.s ? '<div class="krow"><b>'+T('酒')+'</b><span>'+sh.s+'</span></div>' : '')+'</div>'
@@ -305,6 +327,11 @@ function render(){ syncArea();
       + '<a class="prow" target="_blank" href="'+mapUrl('apple', sh2.n + ' ' + areaName())+'">' + T('Apple マップ') + '</a>'
       + '<a class="prow" target="_blank" href="'+mapUrl('yahoo', sh2.n + ' ' + areaName())+'">' + T('Yahoo!マップ') + '</a>'
       + '<button class="pcancel" onclick="setPick(false)">' + T('キャンセル') + '</button></div></div>';
+  }
+  if(s.showAreas){
+    h += '<div class="pickwrap"><div class="pick"><h3>' + T('エリアを選ぶ') + '</h3>'
+      + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ return '<button class="prow' + (AREAKEY===k ? ' on' : '') + '" onclick="pickArea(\'' + k + '\')">' + aname(k) + '<span class="acnt">' + AREAS[k].length + T('軒') + '</span></button>'; }).join('')
+      + '<button class="pcancel" onclick="toggleAreas()">' + T('キャンセル') + '</button></div></div>';
   }
   ui.innerHTML = h;
   var bl = document.getElementById('botlayer'); if(bl) bl.style.display = (s.screen==='map') ? 'none' : 'block';
@@ -532,6 +559,15 @@ render();
 .pick a.prow:nth-of-type(2)::before{background:#17130c}
 .pick a.prow:nth-of-type(3)::before{background:#ff0033}
 .sz-think{width:208px}
+.sc.k{background:#eef4ea;color:#33691e;border:1.5px solid #7a9a5b}
+.areaDrop{position:absolute;top:84px;left:50%;transform:translateX(-50%);z-index:4}
+.adbtn{display:inline-flex;align-items:center;gap:7px;background:#fff;border:2px solid #17130c;border-radius:999px;padding:7px 16px;font-weight:900;font-size:15.5px;color:#17130c;box-shadow:0 2px 0 #17130c;cursor:pointer;font-family:inherit;white-space:nowrap}
+.adbtn .adcaret{color:#ff7a00;font-size:13px}
+.locbtn{position:absolute;left:50%;transform:translateX(-50%);bottom:118px;z-index:4;background:#fff;color:#17130c;border:2px solid #17130c;border-radius:999px;padding:10px 20px;font-weight:900;font-size:14.5px;box-shadow:0 2px 0 #17130c;cursor:pointer;font-family:inherit;white-space:nowrap}
+.locbtn:active{transform:translateX(-50%) scale(.96)}
+.pick .prow.on{background:#17130c;color:#ff9e2c}
+.acnt{float:right;color:#96793f;font-size:13px;font-weight:700}
+.pick .prow.on .acnt{color:#ff9e2c}
 .langSwitch{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:6px;justify-content:center}
 .areaSwitch{max-width:94vw;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .areaSwitch::-webkit-scrollbar{display:none}
