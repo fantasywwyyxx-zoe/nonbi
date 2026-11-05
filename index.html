@@ -266,9 +266,9 @@ function render(){ syncArea();
   var s = window.__S, ui = document.getElementById('ui'), h = '';
   if(s.screen==='idle'){
     setBot('sz-idle', 'idle');
-    h = '<img class="brandlogo" src="assets/logo.png?v=42" alt="のんびー"><div class="areaDrop"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button><button class="locchip" onclick="locateNearest()" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.2" fill="none" stroke="#ff7a00" stroke-width="2.4"/><circle cx="12" cy="12" r="2.4" fill="#ff7a00"/><path d="M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2" stroke="#ff7a00" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>'
-      + '<div class="say" id="homesay" style="font-size:20.5px;letter-spacing:.05em">' + (LANG() === 'en' ? 'Tonight\'s first round, <span class="hl">leave it to me</span>' : '今夜の一杯、<span class="hl">まかせて</span>') + '</div>'
-      + '<div class="homerow"><button class="hbtn" onclick="go(\'fav\')">' + SVG_BMK + T('お気に入り') + (((window.__S.favs || []).length) ? ' (' + (window.__S.favs || []).length + ')' : '') + '</button><button class="hbtn" onclick="goProf()">' + SVG_LIST + T('プロファイル') + '</button><button class="hbtn" onclick="go(\'account\')">' + SVG_USER + T('ログイン') + '</button>' + (window.__S.stn && window.__S.stn.home ? '<button class="hbtn" onclick="gotoStation(\'home\')">🏠 ' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn && window.__S.stn.work ? '<button class="hbtn" onclick="gotoStation(\'work\')">🏢 ' + aname(window.__S.stn.work) + '</button>' : '') + '</div>'
+    h = '<img class="brandlogo" src="assets/logo.png?v=43" alt="のんびー"><div class="areaDrop"><div class="areapill"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button><button class="locchip" onclick="locateNearest()" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.2" fill="none" stroke="#ff7a00" stroke-width="2.4"/><circle cx="12" cy="12" r="2.4" fill="#ff7a00"/><path d="M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2" stroke="#ff7a00" stroke-width="2.4" stroke-linecap="round"/></svg></button></div><div class="areacap">' + T('現在地') + '：' + areaName() + '</div></div>'
+      + '<div class="say" id="homesay" style="font-size:23px;letter-spacing:.05em;line-height:1.35">' + (LANG() === 'en' ? 'Tonight\'s first round, <span class="hl">leave it to me</span>' : '今夜の一杯、<span class="hl">まかせて</span>') + '</div>'
+      + '<div class="homerow"><button class="hbtn" onclick="go(\'fav\')">' + SVG_BMK + T('お気に入り') + (((window.__S.favs || []).length) ? ' (' + (window.__S.favs || []).length + ')' : '') + '</button><button class="hbtn acctbtn" onclick="go(\'account\')">' + SVG_USER + T('ログイン') + '</button>' + (window.__S.stn && window.__S.stn.home ? '<button class="hbtn" onclick="gotoStation(\'home\')">🏠 ' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn && window.__S.stn.work ? '<button class="hbtn" onclick="gotoStation(\'work\')">🏢 ' + aname(window.__S.stn.work) + '</button>' : '') + '</div>'
       + '<button class="pillbtn" style="bottom:calc(88px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><div class="langSwitch"><button class="lsw' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語</button><button class="lsw' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">EN</button></div>'
       + '';
   } else if(s.screen==='ask'){
@@ -333,6 +333,7 @@ function render(){ syncArea();
       + (au
         ? '<div class="acctbox"><div class="acctlead">' + T('ログイン中') + '<br><b>' + au.email + '</b></div>'
           + '<div class="acctnote" style="text-align:left;margin:0 2px 14px">' + T('お気に入り・プロファイル・よく使うエリアは自動でクラウドに保存されるよ。') + '</div>'
+          + '<button class="btn off" style="width:100%;margin-bottom:10px" onclick="go(\'prof\')">' + T('プロファイル') + '</button>'
           + '<button class="btn off" style="width:100%" onclick="doLogout()">' + T('ログアウト') + '</button></div>'
         : '<div class="acctbox"><div class="acctlead">' + T('ログインすると、お気に入り・プロファイル・よく使うエリアが、端末を変えてもそのまま使えるようになるよ。') + '</div>'
           + '<button class="gbtn" onclick="doGoogle()">' + GSVG + T('Google でログイン') + '</button>'
@@ -381,7 +382,7 @@ function render(){ syncArea();
   var gb = document.getElementById('gmapbtn'); if(gb) gb.style.display = (s.screen==='results') ? 'flex' : 'none';
   if(s.screen==='map'){ initGMap(); }
   if(s.screen==='detail'){ prepPoster(); }
-  if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=720)?250:Math.min(220,H*0.36); var bt=(H>=720)?H*0.235:170; var bwCap=(H-270-bt)/1.3327; if(bwCap<bw){ bw=bwCap; var bwr=document.getElementById('botwrap'); if(bwr) bwr.style.width=bw+'px'; } hs.style.top=(bt+bw*1.3327+14)+'px'; } }
+  if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=720)?280:Math.min(220,H*0.36); var bt=(H>=720)?H*0.245:184; var bwCap=(H-246-bt)/1.3327; if(bwCap<bw){ bw=bwCap; var bwr=document.getElementById('botwrap'); if(bwr) bwr.style.width=bw+'px'; } hs.style.top=(bt+bw*1.3327+14)+'px'; } }
 }
 function save(){ window.hatchWidget.setState(window.__S); queueSync(); }
 var SB_URL = 'https://xahcknrprgtvpxrayfot.supabase.co', SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhaGNrbnJwcmd0dnB4cmF5Zm90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM4NTQyNDMsImV4cCI6MjEwOTQzMDI0M30.Jw4VC1tKA2IXs2FWEX53qeK8-NdGlS1tAQodOWkbjAk';
@@ -757,5 +758,27 @@ render();
 .emrow input{flex:1;min-width:0;border:2px solid #17130c;border-radius:14px;padding:12px;font-size:14px;font-weight:700;background:#ffffff;color:#17130c}
 .embtn{flex:none;background:#ff7a00;color:#ffffff;border:2px solid #17130c;border-radius:14px;padding:0 16px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 3px 0 #17130c}
 .embtn:active{transform:translateY(2px);box-shadow:none}
+
+/* UI75 home visual spec */
+#ph{height:100dvh}
+.langSwitch{top:12px;right:12px;left:auto;justify-content:flex-end}
+.lsw{border-width:1.2px;padding:3px 10px;font-size:11.5px;box-shadow:none}
+.lsw.on{box-shadow:none}
+.areaDrop{top:110px;flex-direction:column;gap:4px}
+.areapill{display:flex;align-items:center;gap:2px;background:#ffffff;border:1.5px solid #17130c;border-radius:999px;padding:3px 4px 3px 3px;box-shadow:0 3px 10px rgba(23,19,12,.12)}
+.areapill .adbtn{border:none;box-shadow:none;background:transparent;padding:6px 8px 6px 12px}
+.locchip{width:36px;height:36px;background:transparent;border:none;border-left:1.5px solid rgba(23,19,12,.16);border-radius:0;box-shadow:none}
+.locchip svg{width:20px;height:20px}
+.areacap{font-size:11px;font-weight:700;color:#96793f;letter-spacing:.04em}
+.sz-idle{top:184px}
+@media (min-height:720px){.sz-idle{top:24.5%}}
+#botwrap.sz-idle::after{content:'';position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);width:64%;height:16px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(23,19,12,.30),rgba(23,19,12,0) 68%);z-index:-1;animation:botshadow 3.4s ease-in-out infinite}
+.sz-idle .botstack{animation:botbob 3.4s ease-in-out infinite}
+@keyframes botbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes botshadow{0%,100%{transform:translateX(-50%) scaleX(1);opacity:.85}50%{transform:translateX(-50%) scaleX(.9);opacity:.55}}
+.hl{background:linear-gradient(transparent 60%,rgba(255,122,0,.38) 60%);box-shadow:none}
+.homerow{border-top:1px solid rgba(23,19,12,.14);box-shadow:0 -6px 18px rgba(23,19,12,.05);padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.hbtn.acctbtn{opacity:.55}
+.pillbtn{border-width:1.5px}
 </style>
 </body></html>
