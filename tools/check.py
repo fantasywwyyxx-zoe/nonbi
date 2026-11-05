@@ -147,5 +147,6 @@ ok("UI79" in html and "acctcard" in html and "calc(100% - 16px)" in html, "v79: 
 ok("shibuya" in html and len(SB) == 176, "v80: shibuya area live")
 ok("UI81" in html and "fitAsk" in html and "rescards" in html and "backzone" in html and "resfoot" in html, "v81: audit fix pack")
 ok("shinagawa" in html and len(SG) == 127, "v81: shinagawa area live")
+ok("logVisit" in html and "logstrip" in html and "pushLogs" in html and "飲みログ" in html, "v82: drink log + stamps")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
