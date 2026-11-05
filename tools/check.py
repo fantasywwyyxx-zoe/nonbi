@@ -113,5 +113,8 @@ ok("favheart" in html and "toggleFav" in html and "favList" in html, "favorites 
 ok("applyProfile" in html and "saveProfile" in html and "openProfSave" in html, "scenario profiles wired")
 ok("pickStation" in html and "gotoStation" in html and "homerow" in html and "chooseStation" in html, "home/work stations + home shortcut row wired")
 ok("openFavShop" in html and "stnPick" in html and "keepRet" in html, "fav cross-area open + station picker wired")
+ok("SVG_PIN" in html and "SVG_BMK" in html and "SVG_LIST" in html, "v69: svg icons wired (pin/bookmark/list)")
+ok("UI69 puffy" in html and "⚑" not in html, "v69: puffy UI overrides in, flag glyph retired")
+ok("flex-wrap:wrap;justify-content:center" in html, "v69: homerow centered wrap")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
