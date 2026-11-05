@@ -121,12 +121,14 @@ var ME = null;
 var SHOPS = AREAS.ike;
 function LANG(){ return (window.__S && window.__S.lang) || 'ja'; }
 function T(s){ return (LANG() === 'en' && EN[s]) || s; }
-function setLang(l){ window.__S.lang = l; save(); render(); }
+function setLang(l){ __langMenu = false; window.__S.lang = l; save(); render(); }
 function areaName(){ return LANG() === 'en' ? AREAINFO[AREAKEY].nameE : AREAINFO[AREAKEY].name; }
 function aname(k){ return LANG() === 'en' ? AREAINFO[k].nameE : AREAINFO[k].name; }
 function syncArea(){ AREAKEY = (window.__S && AREAS[window.__S.area]) ? window.__S.area : 'ike'; SHOPS = AREAS[AREAKEY]; }
 function setArea(k){ if(!AREAS[k]) return; var S = window.__S; S.showAreas = false; S.area = k; S.screen='idle'; S.step=0; S.ans={}; S.shop=null; S.pick=false; S.order=[]; S.shown=3; syncArea(); save(); render(); }
 function toggleAreas(){ window.__S.showAreas = !window.__S.showAreas; save(); render(); }
+var __langMenu = false;
+function toggleLang(){ __langMenu = !__langMenu; render(); }
 function pickArea(k){ window.__S.showAreas = false; if(window.__S.screen === 'map') mapArea(k); else setArea(k); }
 function nearestKey(){ if(!ME) return null; function d2(info){ var dx = (info.lat - ME.lat) * 111, dy = (info.lng - ME.lng) * 91; return dx * dx + dy * dy; } var near = null, nd = 1e18; Object.keys(AREAINFO).forEach(function(k){ if(!AREAS[k]) return; var d = d2(AREAINFO[k]); if(d < nd){ nd = d; near = k; } }); return near; }
 function locateNearest(){ sndTap(); if(ME){ var k0 = nearestKey(); if(k0){ setArea(k0); toast(LANG() === 'en' ? 'Nearest area: ' + areaName() : areaName() + 'が一番近いよ'); } return; } if(!navigator.geolocation){ toast(T('この端末では位置情報が使えないみたい…')); return; } toast(T('現在地を探してる…')); navigator.geolocation.getCurrentPosition(function(p){ ME = {lat: p.coords.latitude, lng: p.coords.longitude}; var k = nearestKey(); if(k){ setArea(k); toast(LANG() === 'en' ? 'Nearest area: ' + areaName() : areaName() + 'が一番近いよ'); } }, function(){ toast(T('現在地が取れなかった…端末の位置情報の設定を確認してね')); }, {timeout: 8000, maximumAge: 300000}); }
@@ -269,7 +271,7 @@ function render(){ syncArea();
     h = '<img class="brandlogo" src="assets/logo.png?v=43" alt="のんびー"><div class="areaDrop"><div class="areapill"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button><button class="locchip" onclick="locateNearest()" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.2" fill="none" stroke="#ff7a00" stroke-width="2.4"/><circle cx="12" cy="12" r="2.4" fill="#ff7a00"/><path d="M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2" stroke="#ff7a00" stroke-width="2.4" stroke-linecap="round"/></svg></button></div><div class="areacap">' + T('現在地') + '：' + areaName() + '</div></div>'
       + '<div class="say" id="homesay" style="font-size:23px;letter-spacing:.05em;line-height:1.35">' + (LANG() === 'en' ? 'Tonight\'s first round, <span class="hl">leave it to me</span>' : '今夜の一杯、<span class="hl">まかせて</span>') + '</div>'
       + '<div class="homerow"><button class="hbtn" onclick="go(\'fav\')">' + SVG_BMK + T('お気に入り') + (((window.__S.favs || []).length) ? ' (' + (window.__S.favs || []).length + ')' : '') + '</button><button class="hbtn acctbtn" onclick="go(\'account\')">' + SVG_USER + T('ログイン') + '</button>' + (window.__S.stn && window.__S.stn.home ? '<button class="hbtn" onclick="gotoStation(\'home\')">🏠 ' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn && window.__S.stn.work ? '<button class="hbtn" onclick="gotoStation(\'work\')">🏢 ' + aname(window.__S.stn.work) + '</button>' : '') + '</div>'
-      + '<button class="pillbtn" style="bottom:calc(88px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><div class="langSwitch"><button class="lsw' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語</button><button class="lsw' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">EN</button></div>'
+      + '<button class="pillbtn" style="bottom:calc(88px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><div class="langSwitch"><button class="globeBtn" onclick="toggleLang()" aria-label="Language">' + SVG_GLOBE + '</button>' + (__langMenu ? '<div class="langMenu"><button class="lmItem' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語' + (LANG() === 'ja' ? '<span class="lmCk">✓</span>' : '') + '</button><button class="lmItem' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">English' + (LANG() === 'en' ? '<span class="lmCk">✓</span>' : '') + '</button></div>' : '') + '</div>'
       + '';
   } else if(s.screen==='ask'){
     var cur = QS[s.step];
@@ -489,6 +491,7 @@ function openShop(id, keepRet){ sndOpen(); tryLocate(); if(!keepRet) window.__S.
 function setPick(b){ sndTap(); window.__S.pick=b; save(); render(); }
 function favHas(a, n){ return (window.__S.favs || []).some(function(f){ return f.a === a && f.n === n; }); }
 var SVG_PIN = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z" fill="#ff7a00" stroke="#17130c" stroke-width="1.3"/><circle cx="12" cy="9" r="2.5" fill="#ffffff"/></svg>';
+var SVG_GLOBE = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.7 2.6 4 5.6 4 9s-1.3 6.4-4 9c-2.7-2.6-4-5.6-4-9s1.3-6.4 4-9z"/></svg>';
 var SVG_BMK = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.6h9.6c.6 0 1 .4 1 1V20c0 .4-.5.7-.8.4L12 16.9l-5 3.5c-.3.3-.8 0-.8-.4V4.6c0-.6.4-1 1-1z" fill="#ff7a00" stroke="#17130c" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 var SVG_BMK_ON = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.6h9.6c.6 0 1 .4 1 1V20c0 .4-.5.7-.8.4L12 16.9l-5 3.5c-.3.3-.8 0-.8-.4V4.6c0-.6.4-1 1-1z" fill="#ffffff" stroke="#17130c" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 var SVG_BMK_LINE = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.6h9.6c.6 0 1 .4 1 1V20c0 .4-.5.7-.8.4L12 16.9l-5 3.5c-.3.3-.8 0-.8-.4V4.6c0-.6.4-1 1-1z" fill="#ffffff" stroke="#17130c" stroke-width="1.6" stroke-linejoin="round"/></svg>';
@@ -767,6 +770,14 @@ render();
 .embtn:active{transform:translateY(2px);box-shadow:none}
 /* UI76 email code */
 #emcode{text-align:center;letter-spacing:3px}
+/* UI77 globe language button (scheme A) */
+#ph .langSwitch{top:57px;right:14px;left:auto;bottom:auto;transform:none;display:block;z-index:30}
+.globeBtn{width:40px;height:40px;border-radius:50%;background:#ffffff;border:1.2px solid rgba(23,19,12,.30);color:#17130c;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(23,19,12,.08);padding:0;cursor:pointer}
+.globeBtn svg{width:21px;height:21px}
+.langMenu{position:absolute;top:48px;right:0;width:172px;background:#ffffff;border:1.2px solid rgba(23,19,12,.18);border-radius:16px;box-shadow:0 10px 26px rgba(23,19,12,.16);padding:6px;z-index:31}
+.lmItem{display:flex;justify-content:space-between;align-items:center;width:100%;padding:11px 12px;font-size:15px;font-weight:800;color:#17130c;background:none;border:none;border-radius:11px;font-family:inherit;text-align:left;cursor:pointer}
+.lmItem.on{background:#fff3e2}
+.lmCk{color:#ff7a00;font-weight:900}
 
 /* UI75 home visual spec */
 #ph{height:100dvh}
