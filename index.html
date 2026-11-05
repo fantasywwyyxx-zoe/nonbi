@@ -239,7 +239,7 @@ function badges(sh){
 function cardHtml(sh, idx, pos, areaK){
   var nz = ' nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4);
   var top = sh.img ? '<img src="'+PH[sh.img]+'">' : (sh.ph ? '<img src="'+PHB+sh.ph[0]+'">' : '<div class="noimg'+nz+'">'+dispG(sh)+'</div>');
-  return '<div class="card" style="animation-delay:'+((pos||0)*70)+'ms" onclick="openShop('+idx+')">' + top + '<div class="cb"><button class="favheart'+(favHas(areaK||AREAKEY, sh.n)?' on':'')+'" onclick="toggleFav(\''+(areaK||AREAKEY)+'\',\''+sh.n.replace(/'/g, "\\'")+'\',event)" aria-label="fav">'+(favHas(areaK||AREAKEY, sh.n)?SVG_BMK_ON:SVG_BMK)+'</button><div class="nm" style="padding-right:36px">'+sh.n+'</div><div class="scores">'+badges(sh)+'</div><div class="mt">'+dispG(sh)+' ｜ '+sh.b+'</div><div class="mt" style="color:#96793f;font-weight:700">'+dispTags(sh)+'</div></div></div>';
+  return '<div class="card" style="animation-delay:'+((pos||0)*70)+'ms" onclick="openShop('+idx+')">' + top + '<div class="cb"><button class="favheart'+(favHas(areaK||AREAKEY, sh.n)?' on':'')+'" onclick="toggleFav(\''+(areaK||AREAKEY)+'\',\''+sh.n.replace(/'/g, "\\'")+'\',event)" aria-label="fav">'+(favHas(areaK||AREAKEY, sh.n)?SVG_BMK_ON:SVG_BMK_LINE)+'</button><div class="nm" style="padding-right:36px">'+sh.n+'</div><div class="scores">'+badges(sh)+'</div><div class="mt">'+dispG(sh)+' ｜ '+sh.b+'</div><div class="mt" style="color:#96793f;font-weight:700">'+dispTags(sh)+'</div></div></div>';
 }
 /* ---- persistent robot layer: never re-created, only resized + crossfaded ---- */
 var botState = {cls:'', vid:''};
@@ -269,7 +269,7 @@ function render(){ syncArea();
     h = '<img class="brandlogo" src="assets/logo.png?v=42" alt="のんびー"><div class="areaDrop"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button></div>'
       + '<div class="say" id="homesay" style="font-size:20.5px;letter-spacing:.05em">' + (LANG() === 'en' ? 'Tonight\'s first round, <span class="hl">leave it to me</span>' : '今夜の一杯、<span class="hl">まかせて</span>') + '</div>'
       + '<div class="homerow"><button class="hbtn" onclick="locateNearest()">' + SVG_PIN + T('現在地') + '</button><button class="hbtn" onclick="go(\'fav\')">' + SVG_BMK + T('お気に入り') + (((window.__S.favs || []).length) ? ' (' + (window.__S.favs || []).length + ')' : '') + '</button><button class="hbtn" onclick="go(\'prof\')">' + SVG_LIST + T('プロファイル') + '</button>' + (window.__S.stn && window.__S.stn.home ? '<button class="hbtn" onclick="gotoStation(\'home\')">🏠 ' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn && window.__S.stn.work ? '<button class="hbtn" onclick="gotoStation(\'work\')">🏢 ' + aname(window.__S.stn.work) + '</button>' : '') + '</div>'
-      + '<button class="pillbtn" style="bottom:52px" onclick="go(\'ask\')">' + T('はじめる') + '</button><div class="langSwitch"><button class="lsw' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語</button><button class="lsw' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">EN</button></div>'
+      + '<button class="pillbtn" style="bottom:calc(102px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><div class="langSwitch"><button class="lsw' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語</button><button class="lsw' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">EN</button></div>'
       + '';
   } else if(s.screen==='ask'){
     var cur = QS[s.step];
@@ -342,7 +342,7 @@ function render(){ syncArea();
       + '<div class="btnrow" style="margin-top:auto">'
       + (sh.t ? '<a class="btn tel" href="tel:'+sh.t.replace(/-/g,'')+'">' + T('電話する') + '</a>' : '<span class="btn off">' + T('電話 未確認') + '</span>')
       + '<button class="btn map" onclick="setPick(true)">' + T('地図を開く') + '</button>'
-      + '<button class="btn favb" onclick="toggleFav(\'' + AREAKEY + '\',\'' + sh.n.replace(/'/g, "\\'") + '\')">' + (favHas(AREAKEY, sh.n) ? SVG_BMK + ' ' + T('お気に入り済み') : SVG_BMK + ' ' + T('お気に入り')) + '</button></div>'
+      + '<button class="btn favb" onclick="toggleFav(\'' + AREAKEY + '\',\'' + sh.n.replace(/'/g, "\\'") + '\')">' + (favHas(AREAKEY, sh.n) ? SVG_BMK + ' ' + T('お気に入り済み') : SVG_BMK_LINE + ' ' + T('お気に入り')) + '</button></div>'
       + '</div>';
   }
   if(s.pick && s.shop !== null && s.shop !== undefined){
@@ -365,7 +365,7 @@ function render(){ syncArea();
   var gb = document.getElementById('gmapbtn'); if(gb) gb.style.display = (s.screen==='map' || s.screen==='detail') ? 'none' : 'flex';
   if(s.screen==='map'){ initGMap(); }
   if(s.screen==='detail'){ prepPoster(); }
-  if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=720)?250:Math.min(220,H*0.36); var bt=(H>=720)?H*0.235:142; hs.style.top=(bt+bw*1.3327+16)+'px'; } }
+  if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=720)?250:Math.min(220,H*0.36); var bt=(H>=720)?H*0.235:142; var bwCap=(H-270-bt)/1.3327; if(bwCap<bw){ bw=bwCap; var bwr=document.getElementById('botwrap'); if(bwr) bwr.style.width=bw+'px'; } hs.style.top=(bt+bw*1.3327+14)+'px'; } }
 }
 function save(){ window.hatchWidget.setState(window.__S); }
 (function(){ function bl(){ var ep = document.getElementById('eyepatch'); if(!ep){ setTimeout(bl, 1200); return; } ep.classList.add('blink'); setTimeout(function(){ ep.classList.remove('blink'); }, 130); setTimeout(bl, 2600 + Math.random()*2400); } setTimeout(bl, 1600); })();
@@ -435,6 +435,7 @@ function favHas(a, n){ return (window.__S.favs || []).some(function(f){ return f
 var SVG_PIN = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z" fill="#ff7a00" stroke="#17130c" stroke-width="1.3"/><circle cx="12" cy="9" r="2.5" fill="#ffffff"/></svg>';
 var SVG_BMK = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.6h9.6c.6 0 1 .4 1 1V20c0 .4-.5.7-.8.4L12 16.9l-5 3.5c-.3.3-.8 0-.8-.4V4.6c0-.6.4-1 1-1z" fill="#ff7a00" stroke="#17130c" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 var SVG_BMK_ON = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.6h9.6c.6 0 1 .4 1 1V20c0 .4-.5.7-.8.4L12 16.9l-5 3.5c-.3.3-.8 0-.8-.4V4.6c0-.6.4-1 1-1z" fill="#ffffff" stroke="#17130c" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+var SVG_BMK_LINE = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.6h9.6c.6 0 1 .4 1 1V20c0 .4-.5.7-.8.4L12 16.9l-5 3.5c-.3.3-.8 0-.8-.4V4.6c0-.6.4-1 1-1z" fill="#ffffff" stroke="#17130c" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 var SVG_LIST = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5.2" y="4.6" width="13.6" height="16.6" rx="2.4" fill="#ffffff" stroke="#17130c" stroke-width="1.5"/><rect x="9.2" y="2.4" width="5.6" height="3.8" rx="1.9" fill="#ff7a00" stroke="#17130c" stroke-width="1.1"/><circle cx="9.1" cy="11" r="1.25" fill="#ff7a00"/><circle cx="9.1" cy="15.4" r="1.25" fill="#ff7a00"/><path d="M12.4 11h3.9M12.4 15.4h3.9" stroke="#17130c" stroke-width="1.6" stroke-linecap="round"/></svg>';
 function toggleFav(a, n, ev){ if(ev) ev.stopPropagation(); sndTap(); var S = window.__S; if(!S.favs) S.favs = []; var i = -1; S.favs.forEach(function(f, j){ if(f.a === a && f.n === n) i = j; }); if(i >= 0){ S.favs.splice(i, 1); toast(T('お気に入りから外したよ')); } else { S.favs.push({a: a, n: n}); toast(T('お気に入りに追加したよ')); } save(); render(); }
 function favList(){ var out = []; (window.__S.favs || []).forEach(function(f){ var arr = AREAS[f.a]; if(!arr) return; for(var i = 0; i < arr.length; i++){ if(arr[i].n === f.n){ out.push({a: f.a, i: i, sh: arr[i]}); break; } } }); return out; }
@@ -658,5 +659,12 @@ render();
 #gmapbtn{box-shadow:0 6px 16px rgba(23,19,12,.35),inset 0 1.5px 0 rgba(255,255,255,.22)}
 .langSwitch .lsw.on{background:linear-gradient(180deg,#38302a,#17130c);color:#ff9e2c;box-shadow:0 5px 12px rgba(23,19,12,.28),inset 0 1.5px 0 rgba(255,255,255,.22)}
 .adbtn .ic{width:17px;height:17px}
+
+/* UI70 home: standard app bottom stack (tab bar) */
+.langSwitch{bottom:calc(66px + env(safe-area-inset-bottom))}
+.homerow{bottom:0;background:linear-gradient(180deg,#fffdf8,#fff6e7);border-top:2px solid #17130c;box-shadow:0 -6px 18px rgba(122,84,20,.12);padding:7px 4px calc(7px + env(safe-area-inset-bottom));flex-wrap:nowrap;justify-content:space-around;overflow:visible;z-index:6}
+.hbtn{flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;box-shadow:none;border-radius:14px;padding:5px 2px;font-size:11px}
+.hbtn .ic{width:23px;height:23px}
+.hbtn:active{background:rgba(255,122,0,.10)}
 </style>
 </body></html>
