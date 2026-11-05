@@ -117,5 +117,7 @@ ok("SVG_PIN" in html and "SVG_BMK" in html and "SVG_LIST" in html, "v69: svg ico
 ok("UI69 puffy" in html and "⚑" not in html, "v69: puffy UI overrides in, flag glyph retired")
 ok("SVG_BMK_LINE" in html, "v70: bookmark outline state wired")
 ok("UI70 home" in html and "safe-area-inset-bottom" in html, "v70: bottom tab bar + safe-area stack")
+ok("sz-resS" in html and "saveprof" in html and "more primary" in html, "v71: results compact header + op hierarchy")
+ok("'Google ★' in html and '食べログ ' in html", "v71: score sources labeled in full")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
