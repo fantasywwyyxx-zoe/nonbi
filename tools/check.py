@@ -122,5 +122,8 @@ ok("'Google ★' in html and '食べログ ' in html", "v71: score sources label
 ok("UI72 home scheme 1" in html, "v72: language switch in top bar")
 ok("locchip" in html and "SVG_USER" in html and "account" in html, "v72/73: locate chip by area + account tab/screen")
 ok("#botwrap.sz-resS{width:64px" in html and "(s.screen==='results') ? 'flex' : 'none'" in html, "v73: compact res bot + map only after results")
+ok("signInWithOAuth" in html and "signInWithOtp" in html and "xahcknrprgtvpxrayfot" in html and "__SBKEY__" not in html, "v74: accounts client wired")
+ok("goProf()" in html, "v74: profile gated behind login")
+ok("assets/supabase.min.js" in html, "v74: supabase-js vendored locally")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
