@@ -108,7 +108,7 @@ if(!window.hatchWidget){
 .pcancel{display:block;width:100%;text-align:center;padding:11px;font-weight:700;font-size:14px;color:#888;background:none;border:none;cursor:pointer;font-family:inherit}
 </style>
 <div class="wrap">
-<div class="phone" id="ph"><div id="botlayer"></div><div id="ui"></div><button id="gmapbtn" onclick="go('map')" aria-label="地図"><svg viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></button><button id="locbtn" onclick="locateNearest()" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.2" fill="none" stroke="#ff7a00" stroke-width="2.2"/><circle cx="12" cy="12" r="2.4" fill="#ff7a00"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3" stroke="#ff7a00" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+<div class="phone" id="ph"><div id="botlayer"></div><div id="ui"></div><button id="gmapbtn" onclick="go('map')" aria-label="地図"><svg viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></button></div>
 </div>
 <script>
 var MODE = "img";
@@ -266,7 +266,7 @@ function render(){ syncArea();
   var s = window.__S, ui = document.getElementById('ui'), h = '';
   if(s.screen==='idle'){
     setBot('sz-idle', 'idle');
-    h = '<img class="brandlogo" src="assets/logo.png?v=42" alt="のんびー"><div class="areaDrop"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button></div>'
+    h = '<img class="brandlogo" src="assets/logo.png?v=42" alt="のんびー"><div class="areaDrop"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button><button class="locchip" onclick="locateNearest()" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.2" fill="none" stroke="#ff7a00" stroke-width="2.4"/><circle cx="12" cy="12" r="2.4" fill="#ff7a00"/><path d="M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2" stroke="#ff7a00" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>'
       + '<div class="say" id="homesay" style="font-size:20.5px;letter-spacing:.05em">' + (LANG() === 'en' ? 'Tonight\'s first round, <span class="hl">leave it to me</span>' : '今夜の一杯、<span class="hl">まかせて</span>') + '</div>'
       + '<div class="homerow"><button class="hbtn" onclick="go(\'fav\')">' + SVG_BMK + T('お気に入り') + (((window.__S.favs || []).length) ? ' (' + (window.__S.favs || []).length + ')' : '') + '</button><button class="hbtn" onclick="go(\'prof\')">' + SVG_LIST + T('プロファイル') + '</button><button class="hbtn" onclick="go(\'account\')">' + SVG_USER + T('ログイン') + '</button>' + (window.__S.stn && window.__S.stn.home ? '<button class="hbtn" onclick="gotoStation(\'home\')">🏠 ' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn && window.__S.stn.work ? '<button class="hbtn" onclick="gotoStation(\'work\')">🏢 ' + aname(window.__S.stn.work) + '</button>' : '') + '</div>'
       + '<button class="pillbtn" style="bottom:calc(88px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><div class="langSwitch"><button class="lsw' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語</button><button class="lsw' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">EN</button></div>'
@@ -288,8 +288,8 @@ function render(){ syncArea();
     var near = s.sortMode === 'near';
     var list = (near ? orderNear() : s.order).slice(0, s.shown);
     h = '<button class="backbtn" onclick="backToLastQ()">' + T('← もどる') + '</button>'
-      + '<div class="say" style="top:96px;left:118px;right:10px;text-align:left;font-size:16.5px">' + T('まずこの3軒、どう？') + '</div>'
-      + '<div class="sheet" style="top:174px"><div class="grip"></div>'
+      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('まずこの3軒、どう？') + '</div>'
+      + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + '<div class="sortrow"><button class="sortbtn' + (near ? '' : ' on') + '" onclick="setSort(\'rec\')">' + T('おすすめ順') + '</button><button class="sortbtn' + (near ? ' on' : '') + '" onclick="setSort(\'near\')">' + T('近い順') + '</button></div>'
       + list.map(function(i, pos){ return cardHtml(SHOPS[i], i, pos); }).join('')
       + (s.shown < Math.min(15, s.order.length) ? '<button class="more primary" onclick="more()">' + T('もっと見る（+6軒）') + '</button>' : '')
@@ -327,8 +327,8 @@ function render(){ syncArea();
   } else if(s.screen==='account'){
     setBot('sz-resS', 'idle');
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
-      + '<div class="say" style="top:96px;left:118px;right:10px;text-align:left;font-size:16.5px">' + T('アカウント') + '</div>'
-      + '<div class="sheet" style="top:174px"><div class="grip"></div>'
+      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('アカウント') + '</div>'
+      + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + '<div class="acctbox"><div class="acctlead">' + T('ログインすると、お気に入り・プロファイル・よく使うエリアが、端末を変えてもそのまま使えるようになるよ。') + '</div>'
       + '<button class="btn off" style="width:100%">' + T('ログインは近日公開') + '</button>'
       + '<div class="acctnote">' + T('いまは、この端末の中に保存されているよ。') + '</div></div>'
@@ -371,7 +371,7 @@ function render(){ syncArea();
   }
   ui.innerHTML = h;
   var bl = document.getElementById('botlayer'); if(bl) bl.style.display = (s.screen==='map') ? 'none' : 'block';
-  var gb = document.getElementById('gmapbtn'); if(gb) gb.style.display = (s.screen==='map' || s.screen==='detail') ? 'none' : 'flex';
+  var gb = document.getElementById('gmapbtn'); if(gb) gb.style.display = (s.screen==='results') ? 'flex' : 'none';
   if(s.screen==='map'){ initGMap(); }
   if(s.screen==='detail'){ prepPoster(); }
   if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=720)?250:Math.min(220,H*0.36); var bt=(H>=720)?H*0.235:170; var bwCap=(H-270-bt)/1.3327; if(bwCap<bw){ bw=bwCap; var bwr=document.getElementById('botwrap'); if(bwr) bwr.style.width=bw+'px'; } hs.style.top=(bt+bw*1.3327+14)+'px'; } }
@@ -697,11 +697,15 @@ render();
 .areaDrop{top:114px}
 .sz-idle{top:170px}
 @media (min-height:720px){.sz-idle{top:23.5%}}
-#locbtn{position:absolute;top:10px;right:65px;width:47px;height:47px;border-radius:50%;background:#17130c;border:2px solid #ffffff;box-shadow:0 4px 14px rgba(23,19,12,.35);z-index:35;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
-#locbtn svg{width:24px;height:24px}
-#locbtn:active{transform:scale(.94)}
 .acctbox{padding:8px 4px}
 .acctlead{font-weight:700;font-size:14.5px;line-height:1.75;color:#4a3a22;margin:2px 2px 14px}
 .acctnote{margin-top:12px;font-size:12.5px;color:#96793f;font-weight:700;text-align:center}
+
+/* UI73 compact list headers + locate chip by area + map after results */
+#botwrap.sz-resS{width:64px;top:58px;left:16px;transition-duration:.3s}
+.areaDrop{display:flex;gap:8px;align-items:center}
+.locchip{width:42px;height:42px;border-radius:50%;background:#17130c;border:2px solid #ffffff;box-shadow:0 4px 12px rgba(23,19,12,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
+.locchip svg{width:22px;height:22px}
+.locchip:active{transform:scale(.93)}
 </style>
 </body></html>

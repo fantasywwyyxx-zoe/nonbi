@@ -120,6 +120,7 @@ ok("UI70 home" in html and "safe-area-inset-bottom" in html, "v70: bottom tab ba
 ok("sz-resS" in html and "saveprof" in html and "more primary" in html, "v71: results compact header + op hierarchy")
 ok("'Google ★' in html and '食べログ ' in html", "v71: score sources labeled in full")
 ok("UI72 home scheme 1" in html, "v72: language switch in top bar")
-ok("locbtn" in html and "SVG_USER" in html and "account" in html, "v72: locate by map button + account tab/screen")
+ok("locchip" in html and "SVG_USER" in html and "account" in html, "v72/73: locate chip by area + account tab/screen")
+ok("#botwrap.sz-resS{width:64px" in html and "(s.screen==='results') ? 'flex' : 'none'" in html, "v73: compact res bot + map only after results")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
