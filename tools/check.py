@@ -129,5 +129,6 @@ ok("areapill" in html and "areacap" in html and "botbob" in html and "100dvh" in
 ok("verifyOtp" in html and "emcode" in html and "doCode" in html and "コードを送る" in html, "v76: email code two-step login")
 ok("globeBtn" in html and "langMenu" in html and "toggleLang" in html, "v77: globe language button + menu")
 ok("UI78 home spacing" in html and "sayB" in html, "v78: home spacing rebalance")
+ok("UI79" in html and "acctcard" in html and "calc(100% - 16px)" in html, "v79: peek overlap + fav nowrap + account cards")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
