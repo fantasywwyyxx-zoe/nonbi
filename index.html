@@ -168,7 +168,7 @@ var EN = {
 '厳選マップ':'Curated Map','軒':' spots','◎ 現在地':'◎ My location','（写真は準備中）':'(Photo coming soon)',
 '飲み放題あり':'All-you-can-drink','住所':'Address','営業':'Hours','予算':'Budget','酒':'Drinks',
 '電話する':'Call','電話 未確認':'No phone listed','地図を開く':'Open in Maps',
-'どのマップで開く？':'Open with which map?','Googleマップでお店を見る':'View on Google Maps','シェアする':'Share','画像でシェア':'Share image','Threadsでシェア':'Share on Threads','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
+'どのマップで開く？':'Open with which map?','Googleマップでお店を見る':'View on Google Maps','ログインすると、保存や同期ができるよ':'Save and sync with an account','あとで行きたいお店リスト':'Your saved places for later','みんなが公開した条件を見てみよう':'Public presets from everyone','よく使う条件を保存しておけるよ':'Your saved search presets','お気に入りと訪問数で集計したよ':'Ranked by saves and visits','あなたの行きつけのお店':'Your regular spots','条件はそのまま使えるよ':'Use these conditions as-is','気になるお店を保存しよう':'Save the ones you like','行ったお店に一言タグで評価しよう':'Tag it in one word','テーマに合うお店を集めたよ':'Shops matching this theme','行ったお店の記録だよ':'Your drinking log','保存と設定はここから':'Your saves and settings','指定なし':'No preference','シェアする':'Share','画像でシェア':'Share image','Threadsでシェア':'Share on Threads','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
 '約':'~','飲み屋':'Izakaya','Googleと食べログの高評価だけを厳選':'Only top-rated spots from Google & Tabelog',
 'ポスターを作ってるよ…':'Making your poster…','画像は長押しで写真に保存できます':'Long-press the image to save it to your photos',
 'シェアする':'Share','リンクをコピー':'Copy link','閉じる':'Close','ごめん、作れなかった…':'Sorry, that did not work…','リンクをコピーしました':'Link copied',
@@ -290,8 +290,8 @@ function render(){ syncArea();
            + '<button class="pillbtn" style="bottom:calc(88px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><a id="privlink" href="https://nonbi.jp/privacy/" target="_blank" rel="noopener">' + T('プライバシーポリシー') + '</a><div class="langSwitch"><button class="globeBtn" onclick="toggleLang()" aria-label="Language">' + SVG_GLOBE + '</button>' + (__langMenu ? '<div class="langMenu"><button class="lmItem' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語' + (LANG() === 'ja' ? '<span class="lmCk">✓</span>' : '') + '</button><button class="lmItem' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">English' + (LANG() === 'en' ? '<span class="lmCk">✓</span>' : '') + '</button></div>' : '') + '</div>'
       + '';
   } else if(s.screen==='gate'){
-    setBot('sz-resS', 'idle');
-    h = '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('ログインしてはじめよう') + '</div>'
+    setBot('sz-rR', 'idle');
+    h = '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('ログインしてはじめよう') + '</span><div class="subline">' + T('ログインすると、保存や同期ができるよ') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + '<div class="acctcard"><div class="acctlead">' + T('ログインすると、お気に入り・プロファイル・よく使うエリアが、端末を変えてもそのまま使えるようになるよ。') + '</div>'
       + '<button class="lnbtn" onclick="doLine()">' + T('LINEでログイン') + '</button>'
@@ -340,66 +340,76 @@ function render(){ syncArea();
       + '<div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column"><div id="gmap" style="flex:1;min-height:0;position:relative;background:#e9e2d2"></div><button onclick="locateOnMap()" style="position:absolute;right:12px;bottom:14px;z-index:5;background:#fff;color:#17130c;border:2px solid #17130c;border-radius:999px;padding:9px 15px;font-weight:900;font-size:14px;box-shadow:0 3px 10px rgba(0,0,0,.25)">' + T('◎ 現在地') + '</button></div>'
       + '<div id="mapcard"></div></div>';
   } else if(s.screen==='fav'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var fl = favList();
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + SVG_BMK + ' ' + T('お気に入り') + (fl.length ? '（' + fl.length + T('軒') + '）' : '') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + SVG_BMK + ' ' + T('お気に入り') + (fl.length ? '（' + fl.length + T('軒') + '）' : '') + '</span><div class="subline">' + T('あとで行きたいお店リスト') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (fl.length ? '<button class="sharelist" onclick="shareFavs()">' + T('リストを共有する') + '</button>' : '') + (fl.length ? fl.map(function(x, pos){ return cardHtml(x.sh, x.i, pos, x.a).replace('onclick="openShop(' + x.i + ')"', 'onclick="openFavShop(\'' + x.a + '\',' + x.i + ')"'); }).join('') : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + T('まだお気に入りがないよ') + '<br>' + T('店のカードのブックマークを押すと、ここにたまるよ') + '<br><button class="more primary" style="margin-top:16px" onclick="go(\'ask\')">' + T('お店を探しに行く') + '</button></div>')
       + '</div>';
   } else if(s.screen==='pubboard'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var pb = __pubs || [];
-    var pbRows = pb.map(function(p, ix){ return '<div class="logrow"><div class="lgmain"><div class="lgname">' + String(p.name).replace(/</g, '&lt;') + '</div><div class="lgmeta">' + aname(p.area) + ' · ' + ansSummary(p.ans) + (p.uses ? ' · ' + p.uses + (LANG() === 'en' ? ' uses' : '回使われた') : '') + '</div></div><button class="pubbtn" onclick="savePubProfile(' + ix + ')">' + T('保存') + '</button><button class="pubbtn pri" onclick="usePubProfile(' + ix + ')">' + T('使う') + '</button></div>'; }).join('');
+    var pbRows = pb.map(function(p, ix){ return '<div class="logrow"><div class="lgmain" onclick="openPubDetail(' + ix + ')" style="cursor:pointer"><div class="lgname">' + String(p.name).replace(/</g, '&lt;') + '</div><div class="lgmeta">' + aname(p.area) + ' · ' + ansSummary(p.ans) + (p.uses ? ' · ' + p.uses + (LANG() === 'en' ? ' uses' : '回使われた') : '') + '</div></div><button class="pubbtn" onclick="savePubProfile(' + ix + ')">' + T('保存') + '</button><button class="pubbtn pri" onclick="usePubProfile(' + ix + ')">' + T('使う') + '</button></div>'; }).join('');
     h = '<button class="backbtn" onclick="go(\'comm\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'comm\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('みんなのプロファイル') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('みんなのプロファイル') + '</span><div class="subline">' + T('みんなが公開した条件を見てみよう') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (pb.length ? pbRows : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + (__pubs === null ? T('読み込み中…') : T('まだ公開プロファイルがないよ') + '<br>' + T('自分のプロファイルを公開すると、ここに載るよ')) + '</div>')
       + '</div>';
+  } else if(s.screen==='pubdetail'){
+    setBot('sz-rR', 'idle');
+    var pd = (__pubs || [])[s.pubSel || 0] || null;
+    var pdRows = pd ? '<div class="kv">' + QS.map(function(q){ var v = pd.ans ? pd.ans[q.k] : null; return '<div class="krow"><b>' + T(q.q) + '</b><span>' + (v ? String(v).replace(/</g, '&lt;') : T('指定なし')) + '</span></div>'; }).join('') + '</div>' : '';
+    h = '<button class="backbtn" onclick="go(\'pubboard\')">' + T('← もどる') + '</button>'
+      + '<div class="backzone" onclick="go(\'pubboard\')"></div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + (pd ? String(pd.name).replace(/</g, '&lt;') : T('プロファイル')) + '</span><div class="subline">' + (pd ? aname(pd.area) + (pd.uses ? ' · ' + pd.uses + (LANG() === 'en' ? ' uses' : '回使われた') : '') : '') + '</div></div>'
+      + '<div class="sheet" style="top:150px"><div class="grip"></div>'
+      + (pd ? pdRows + '<div class="btnrow" style="margin-top:16px"><button class="btn sub" onclick="savePubProfile(' + (s.pubSel || 0) + ')">' + T('保存') + '</button><button class="btn" onclick="usePubProfile(' + (s.pubSel || 0) + ')">' + T('使う') + '</button></div>' : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px">' + T('読み込み中…') + '</div>')
+      + '</div>';
   } else if(s.screen==='prof'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var pl = window.__S.profs || [];
     var stnh = (window.__S.stn && window.__S.stn.home) ? aname(window.__S.stn.home) : T('設定しない');
     var stnw = (window.__S.stn && window.__S.stn.work) ? aname(window.__S.stn.work) : T('設定しない');
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + SVG_LIST + ' ' + T('プロファイル') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + SVG_LIST + ' ' + T('プロファイル') + '</span><div class="subline">' + T('よく使う条件を保存しておけるよ') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (pl.length ? pl.map(function(p, i){ return '<div class="profrow"><button class="profmain" onclick="applyProfile(' + i + ')"><b>' + p.name + '</b><span>' + ansSummary(p.ans) + '</span></button><button class="profshare" onclick="shareProf(' + i + ')">' + T('シェア') + '</button><button class="profpub' + (p.pubId ? ' on' : '') + '" onclick="togglePublish(' + i + ')">' + (p.pubId ? T('公開中') : T('公開')) + '</button><button class="profdel" onclick="delProfile(' + i + ')" aria-label="del">✕</button></div>'; }).join('') : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:14px 6px 20px;line-height:1.8">' + T('まだプロファイルがないよ') + '<br>' + T('検索結果の画面で「この条件をプロファイルに保存」から作れるよ') + '</div>')
       + '</div>';
   } else if(s.screen==='rank'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var rk = [];
     SHOPS.forEach(function(sh, i){ var st = statFor(AREAKEY, sh.n); if(st && (st.fav_users + st.visit_count) > 0) rk.push({sh: sh, i: i, st: st, sc: st.fav_users * 2 + st.visit_count}); });
     rk.sort(function(x, y){ return y.sc - x.sc; });
     rk = rk.slice(0, 12);
     h = '<button class="backbtn" onclick="go(\'results\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'results\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + aname(AREAKEY) + T('の人気店') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + aname(AREAKEY) + T('の人気店') + '</span><div class="subline">' + T('お気に入りと訪問数で集計したよ') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (rk.length ? rk.map(function(x, pos){ var th = x.sh.ph ? '<img class="lgthumb" src="' + PHB + x.sh.ph[0] + '">' : '<div class="lgthumb noimg nz' + ((x.sh.n.charCodeAt(0) + x.sh.n.length) % 4) + '"></div>'; return '<div class="logrow rkrow" onclick="openRank(' + x.i + ')"><span class="rkno">' + (pos + 1) + '</span>' + th + '<div class="lgmain"><div class="lgname">' + x.sh.n + '</div><div class="lgmeta">' + popText(AREAKEY, x.sh) + '</div></div><span class="chev">›</span></div>'; }).join('')
         : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + T('まだデータが少ないよ') + '<br>' + T('お気に入りや「行った！」が増えると、人気順に並ぶよ') + '</div>')
       + '</div>';
   } else if(s.screen==='reg'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var rl = regList();
     var rRows = rl.map(function(o){ var arr = AREAS[o.a] || []; var sh = null, si = -1; for(var q3 = 0; q3 < arr.length; q3++){ if(arr[q3].n === o.n){ sh = arr[q3]; si = q3; break; } } if(!sh) return ''; var th = sh.ph ? '<img class="lgthumb" src="' + PHB + sh.ph[0] + '">' : '<div class="lgthumb noimg nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4) + '"></div>'; return '<div class="logrow" onclick="openRegShop(\'' + o.a + '\',' + si + ')">' + th + '<div class="lgmain"><div class="lgname">' + sh.n + '</div><div class="lgmeta">' + aname(o.a) + ' · ' + o.c + (LANG() === 'en' ? ' visits' : '回') + ' · ' + o.d.replace(/-/g, '/') + '</div></div><span class="chev">›</span></div>'; }).join('');
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + SVG_STAMP + ' ' + T('常連') + (rl.length ? '（' + rl.length + T('軒') + '）' : '') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + SVG_STAMP + ' ' + T('常連') + (rl.length ? '（' + rl.length + T('軒') + '）' : '') + '</span><div class="subline">' + T('あなたの行きつけのお店') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (rl.length ? rRows : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + T('まだ常連の店がないよ') + '<br>' + T('「行った！」が増えると、よく行く店がここに並ぶよ') + '<br><button class="more primary" style="margin-top:16px" onclick="go(\'ask\')">' + T('お店を探しに行く') + '</button></div>')
       + '</div>';
   } else if(s.screen==='pshare'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var sp = s.sharedProf;
     var spRows = '';
     if(sp){ QS.forEach(function(q){ var v = sp.ans ? sp.ans[q.k] : null; var lab = ''; if(v) lab = v; if(lab) spRows += '<div class=\"sharow\"><span>' + q.k + '</span><b>' + lab + '</b></div>'; }); }
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('共有されたプロファイル') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('共有されたプロファイル') + '</span><div class="subline">' + T('条件はそのまま使えるよ') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (sp ? '<div style="font-size:21px;font-weight:900;color:#17130c;margin:4px 0 2px">' + sp.n + '</div>'
         + '<div style="font-size:13.5px;color:#96793f;font-weight:700;margin-bottom:8px">' + aname(sp.a) + '</div>'
@@ -409,11 +419,11 @@ function render(){ syncArea();
         : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + T('リンクが正しくないみたい') + '</div>')
       + '</div>';
   } else if(s.screen==='shared'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var sl = (window.__S.shared || []).map(function(x){ var arr = AREAS[x.a]; var sh2 = arr && arr[x.i]; return sh2 ? {a: x.a, i: x.i, sh: sh2} : null; }).filter(function(x){ return !!x; });
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('共有されたお気に入り') + (sl.length ? '（' + sl.length + T('軒') + '）' : '') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('共有されたお気に入り') + (sl.length ? '（' + sl.length + T('軒') + '）' : '') + '</span><div class="subline">' + T('気になるお店を保存しよう') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (sl.length ? '<button class="more primary" style="margin-bottom:12px" onclick="importShared()">' + T('まとめてお気に入りに追加') + '</button>' + sl.map(function(x, pos){ return cardHtml(x.sh, x.i, pos, x.a).replace('onclick="openShop(' + x.i + ')"', 'onclick="openSharedShop(\'' + x.a + '\',' + x.i + ')"'); }).join('')
         : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + T('リンクが正しくないみたい') + '</div>')
@@ -437,28 +447,28 @@ function render(){ syncArea();
       + '<button class="more ghost" style="margin-top:10px" onclick="goPubBoard()">' + T('みんなのプロファイル') + '</button>'
       + '</div>';
   } else if(s.screen==='review'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var rsh = SHOPS[s.shop];
     h = '<button class="backbtn" onclick="go(\'detail\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'detail\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('評価') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('評価') + '</span><div class="subline">' + T('行ったお店に一言タグで評価しよう') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (rsh ? '<div style="font-weight:800;font-size:17px;margin:2px 2px 12px">' + rsh.n + '</div>' + voteHtml(AREAKEY, rsh) : '')
       + '</div>';
   } else if(s.screen==='feat'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var fd = FEATS[0]; FEATS.forEach(function(f){ if(f.id === s.feat) fd = f; });
     var fl = featList(fd.id);
     var fRows = fl.map(function(x){ var th = x.sh.ph ? '<img class=\"lgthumb\" src=\"' + PHB + x.sh.ph[0] + '\">' : '<div class=\"lgthumb noimg nz' + ((x.sh.n.charCodeAt(0) + x.sh.n.length) % 4) + '\"></div>'; var meta = aname(x.a) + (x.sh.b ? ' · ' + x.sh.b : '') + (x.sh.ts ? ' · 食べログ ' + x.sh.ts : ''); return '<div class=\"logrow\" onclick=\"openFeatShop(\'' + x.a + '\',' + x.i + ')\">' + th + '<div class=\"lgmain\"><div class=\"lgname\">' + x.sh.n + '</div><div class=\"lgmeta\">' + meta + '</div></div><span class=\"chev\">›</span></div>'; }).join('');
     h = '<button class=\"backbtn\" onclick=\"go(\'comm\')\">' + T('← もどる') + '</button>'
       + '<div class=\"backzone\" onclick=\"go(\'comm\')\"></div>'
-      + '<div class=\"say\" style=\"top:88px;left:88px;right:10px;text-align:left;font-size:16.5px\">' + T(fd.t) + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T(fd.t) + '</span><div class="subline">' + T('テーマに合うお店を集めたよ') + '</div></div>'
       + '<div class=\"sheet\" style=\"top:150px\"><div class=\"grip\"></div>'
       + '<div style=\"font-size:12.5px;color:#8a6d3f;font-weight:700;margin-bottom:6px\">' + T(fd.d) + '（' + featCount(fd.id) + T('軒') + '）</div>'
       + (fRows || '<div style=\"text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8\">' + T('まだデータが少ないよ') + '</div>')
       + '</div>';
   } else if(s.screen==='log'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var lg = window.__S.logs || [];
     var shopsN = {}; lg.forEach(function(e){ shopsN[e.a + ':' + e.n] = 1; }); var ordK = {}; var ordOf = {}; lg.forEach(function(e2, ix2){ var k2 = e2.a + ':' + e2.n; ordK[k2] = (ordK[k2] || 0) + 1; ordOf[ix2] = ordK[k2]; });
     var sorted = lg.map(function(e, ix){ return {e: e, ix: ix}; }).sort(function(x, y){ return (y.e.d > x.e.d) ? 1 : ((y.e.d < x.e.d) ? -1 : (y.ix - x.ix)); });
@@ -479,19 +489,19 @@ function render(){ syncArea();
     }).join('');
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('飲みログ') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('飲みログ') + '</span><div class="subline">' + T('行ったお店の記録だよ') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (lg.length
         ? '<div class="lgsum">' + T('行った店') + ' <b>' + Object.keys(shopsN).length + T('軒') + '</b> · ' + T('スタンプ') + ' <b>' + lg.length + (LANG() === 'en' ? ' stamps' : '個') + '</b></div>' + progHtml + rows
         : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + T('まだ記録がないよ') + '<br>' + T('お店の「行った！」を押すと、スタンプがたまるよ') + '<br><button class="more primary" style="margin-top:16px" onclick="go(\'ask\')">' + T('お店を探しに行く') + '</button></div>')
       + '</div>';
   } else if(s.screen==='account'){
-    setBot('sz-resS', 'idle');
+    setBot('sz-rR', 'idle');
     var stnh = (window.__S.stn && window.__S.stn.home) ? aname(window.__S.stn.home) : T('設定しない'); var stnw = (window.__S.stn && window.__S.stn.work) ? aname(window.__S.stn.work) : T('設定しない');
     var au = USER();
     h = '<button class="backbtn" style="font-size:14.5px;padding:9px 16px 9px 13px" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
-      + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('マイページ') + '</div>'
+      + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('マイページ') + '</span><div class="subline">' + T('保存と設定はここから') + '</div></div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (au
         ? '<div class="acctcard"><div class="acctrow"><div class="acctava">' + SVG_USER_W + '</div><div><div class="acctstat"><i></i>' + T('ログイン中') + '</div><div class="acctmail">' + (au.email || 'LINE') + '</div></div></div>'
@@ -558,8 +568,8 @@ function render(){ syncArea();
   }
   ui.innerHTML = h; window.__prevScr = s.screen;
   var __tb = document.getElementById('tabbar');
-  var __tbOn = {idle:1, ask:1, results:1, detail:1, account:1, fav:1, prof:1, log:1, reg:1, comm:1, rank:1, feat:1, review:1, pshare:1, shared:1, pubboard:1};
-  if(__tbOn[s.screen] && !s.pick && !s.showAreas && !s.sharePick){ if(!__tb){ __tb = document.createElement('div'); __tb.id = 'tabbar'; __tb.className = 'tabbar'; ph.appendChild(__tb); } var __act = s.screen === 'reg' ? 0 : (s.screen === 'comm' || s.screen === 'rank' || s.screen === 'feat' || s.screen === 'pubboard') ? 1 : (s.screen === 'account' || s.screen === 'fav' || s.screen === 'prof' || s.screen === 'log' || s.screen === 'review' || s.screen === 'pshare' || s.screen === 'shared') ? 2 : -1; __tb.innerHTML = '<button class="tbtn' + (__act === 0 ? ' on' : '') + '" onclick="go(\'reg\')">' + SVG_STAMP + '<span>' + T('常連') + '</span></button><button class="tbtn' + (__act === 1 ? ' on' : '') + '" onclick="goCommunity()">' + SVG_USERS + '<span>' + T('コミュニティ') + '</span></button><button class="tbtn' + (__act === 2 ? ' on' : '') + '" onclick="go(\'account\')">' + SVG_USER + '<span>' + (__user ? T('マイページ') : T('ログイン')) + '</span></button>'; __tb.style.display = 'flex'; }
+  var __tbOn = {idle:1, ask:1, results:1, detail:1, account:1, fav:1, prof:1, log:1, reg:1, comm:1, rank:1, feat:1, review:1, pshare:1, shared:1, pubboard:1, pubdetail:1};
+  if(__tbOn[s.screen] && !s.pick && !s.showAreas && !s.sharePick){ if(!__tb){ __tb = document.createElement('div'); __tb.id = 'tabbar'; __tb.className = 'tabbar'; ph.appendChild(__tb); } var __act = s.screen === 'reg' ? 0 : (s.screen === 'comm' || s.screen === 'rank' || s.screen === 'feat' || s.screen === 'pubboard' || s.screen === 'pubdetail') ? 1 : (s.screen === 'account' || s.screen === 'fav' || s.screen === 'prof' || s.screen === 'log' || s.screen === 'review' || s.screen === 'pshare' || s.screen === 'shared') ? 2 : -1; __tb.innerHTML = '<button class="tbtn' + (__act === 0 ? ' on' : '') + '" onclick="go(\'reg\')">' + SVG_STAMP + '<span>' + T('常連') + '</span></button><button class="tbtn' + (__act === 1 ? ' on' : '') + '" onclick="goCommunity()">' + SVG_USERS + '<span>' + T('コミュニティ') + '</span></button><button class="tbtn' + (__act === 2 ? ' on' : '') + '" onclick="go(\'account\')">' + SVG_USER + '<span>' + (__user ? T('マイページ') : T('ログイン')) + '</span></button>'; __tb.style.display = 'flex'; }
   else if(__tb){ __tb.style.display = 'none'; }
   var bl = document.getElementById('botlayer'); if(bl) bl.style.display = (s.screen==='map') ? 'none' : 'block';
   var gb = document.getElementById('gmapbtn'); if(gb) gb.style.display = (s.screen==='results') ? 'flex' : 'none';
@@ -659,6 +669,7 @@ function togglePublish(i){ var p = (window.__S.profs || [])[i]; if(!p || !__sb |
 var __pubs = null;
 function goPubBoard(){ go('pubboard'); loadPubs(); }
 function loadPubs(){ if(!__sb) return; __sb.from('pub_profiles').select('id,name,area,ans,uses').order('uses', {ascending: false}).limit(30).then(function(r){ if(r && r.data){ __pubs = r.data; if(window.__S.screen === 'pubboard') render(); } }); }
+function openPubDetail(ix){ window.__S.pubSel = ix; sndTap(); go('pubdetail'); }
 function usePubProfile(ix){ var p = (__pubs || [])[ix]; if(!p) return; sndTap(); if(p.id && __sb) __sb.rpc('bump_profile_uses', {pid: p.id}).then(function(){}); window.__S.area = p.area; syncArea(); window.__S.ans = JSON.parse(JSON.stringify(p.ans)); window.__S.screen = 'think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.profSave = false; window.__S.ret = 'results'; save(); render(); }, 1700); }
 function savePubProfile(ix){ var p = (__pubs || [])[ix]; if(!p) return; var S = window.__S; if(!S.profs) S.profs = []; S.profs.push({name: p.name, ans: JSON.parse(JSON.stringify(p.ans))}); save(); toast(T('プロファイルを保存したよ')); if(p.id && __sb) __sb.rpc('bump_profile_uses', {pid: p.id}).then(function(){}); }
 function applySharedProf(){ var sp = window.__S.sharedProf; if(!sp) return; if(requireLogin()) return; sndTap(); window.__S.area = sp.a; syncArea(); window.__S.ans = JSON.parse(JSON.stringify(sp.ans)); window.__S.screen = 'think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.profSave = false; window.__S.ret = 'results'; save(); render(); }, 1700); }
@@ -875,6 +886,10 @@ botState.vid = 'idle';
 render();
 </script>
 <style>
+#botwrap.sz-rR{width:64px;top:58px;left:auto;right:16px;transform:none;transition-duration:.3s}
+.mk{background:linear-gradient(transparent 64%, #ffc98a 64%);padding:0 3px}
+.subline{font-size:12.5px;font-weight:700;color:#8a6d3f;margin-top:7px}
+.say .ic{width:20px;height:20px;vertical-align:-4px}
 .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:28;background:#fffdf7;border-top:2px solid #17130c;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:4px}
 .tbtn{flex:1;background:none;border:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0 3px;font-size:11px;font-weight:800;color:#8a6d3f;cursor:pointer;border-radius:12px}
 .tbtn svg{width:22px;height:22px;fill:#8a6d3f}
