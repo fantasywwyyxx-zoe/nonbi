@@ -168,7 +168,7 @@ var EN = {
 '厳選マップ':'Curated Map','軒':' spots','◎ 現在地':'◎ My location','（写真は準備中）':'(Photo coming soon)',
 '飲み放題あり':'All-you-can-drink','住所':'Address','営業':'Hours','予算':'Budget','酒':'Drinks',
 '電話する':'Call','電話 未確認':'No phone listed','地図を開く':'Open in Maps',
-'どのマップで開く？':'Open with which map?','シェアする':'Share','画像でシェア':'Share image','Threadsでシェア':'Share on Threads','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
+'どのマップで開く？':'Open with which map?','Googleマップでお店を見る':'View on Google Maps','シェアする':'Share','画像でシェア':'Share image','Threadsでシェア':'Share on Threads','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
 '約':'~','飲み屋':'Izakaya','Googleと食べログの高評価だけを厳選':'Only top-rated spots from Google & Tabelog',
 'ポスターを作ってるよ…':'Making your poster…','画像は長押しで写真に保存できます':'Long-press the image to save it to your photos',
 'シェアする':'Share','リンクをコピー':'Copy link','閉じる':'Close','ごめん、作れなかった…':'Sorry, that did not work…','リンクをコピーしました':'Link copied',
@@ -281,14 +281,13 @@ function fitAsk(){
 function render(){ syncArea();
   var __s0 = window.__S; if(!__s0.favs) __s0.favs = []; if(!__s0.profs) __s0.profs = []; if(!__s0.stn) __s0.stn = {home:'', work:''}; if(__s0.ret === undefined) __s0.ret = 'results'; if(__s0.profSave === undefined) __s0.profSave = false; if(__s0.stnPick === undefined) __s0.stnPick = null; if(!__s0.logs) __s0.logs = []; if(!__s0.logDel) __s0.logDel = []; if(!__s0.shared) __s0.shared = []; if(!__s0.votes) __s0.votes = {}; __s0.logs.forEach(function(e){ if(e.n === undefined && e.i !== undefined){ var a0 = AREAS[e.a]; if(a0 && a0[e.i]) e.n = a0[e.i].n; delete e.i; } });
   var s = window.__S, ui = document.getElementById('ui'), h = '';
-  if(__authDone && !__user && s.screen !== 'gate' && s.screen !== 'idle' && s.screen !== 'account' && s.screen !== 'detail'){ s.pendingScr = s.screen; s.screen = 'gate'; }
+  if(__authDone && !__user && s.screen !== 'gate' && s.screen !== 'idle' && s.screen !== 'account' && s.screen !== 'detail' && s.screen !== 'pshare' && s.screen !== 'shared'){ s.pendingScr = s.screen; s.screen = 'gate'; }
   if(__authDone && __user && s.screen === 'gate'){ s.screen = s.pendingScr || 'idle'; s.pendingScr = null; }
   if(s.screen==='idle'){
     setBot('sz-idle', 'idle');
     h = '<img class="brandlogo" src="assets/logo.png?v=43" alt="のんびー"><div class="areaDrop"><div class="areapill"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button><button class="locchip" onclick="locateNearest()" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.2" fill="none" stroke="#ff7a00" stroke-width="2.4"/><circle cx="12" cy="12" r="2.4" fill="#ff7a00"/><path d="M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2" stroke="#ff7a00" stroke-width="2.4" stroke-linecap="round"/></svg></button></div><div class="areacap">' + T('現在地') + '：' + areaName() + '</div></div>'
       + '<div class="say" id="homesay" style="font-size:23px;letter-spacing:.05em;line-height:1.35">' + (LANG() === 'en' ? 'Tonight\'s first round, <span class="hl">leave it to me</span>' : '今夜の一杯、<span class="hl">まかせて</span>') + '</div>'
-      + '<div class="homerow"><button class="hbtn" onclick="go(\'reg\')">' + SVG_STAMP + T('常連') + (regCount() ? ' (' + regCount() + ')' : '') + '</button><button class="hbtn" onclick="goCommunity()">' + SVG_USERS + T('コミュニティ') + '</button><button class="hbtn acctbtn" onclick="go(\'account\')">' + SVG_USER + (__user ? T('マイページ') : T('ログイン')) + '</button>' + (window.__S.stn && window.__S.stn.home ? '<button class="hbtn" onclick="gotoStation(\'home\')">' + SVG_HOME + ' ' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn && window.__S.stn.work ? '<button class="hbtn" onclick="gotoStation(\'work\')">' + SVG_BLDG + ' ' + aname(window.__S.stn.work) + '</button>' : '') + '</div>'
-      + '<button class="pillbtn" style="bottom:calc(88px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><a id="privlink" href="https://nonbi.jp/privacy/" target="_blank" rel="noopener">' + T('プライバシーポリシー') + '</a><div class="langSwitch"><button class="globeBtn" onclick="toggleLang()" aria-label="Language">' + SVG_GLOBE + '</button>' + (__langMenu ? '<div class="langMenu"><button class="lmItem' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語' + (LANG() === 'ja' ? '<span class="lmCk">✓</span>' : '') + '</button><button class="lmItem' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">English' + (LANG() === 'en' ? '<span class="lmCk">✓</span>' : '') + '</button></div>' : '') + '</div>'
+           + '<button class="pillbtn" style="bottom:calc(88px + env(safe-area-inset-bottom))" onclick="go(\'ask\')">' + T('はじめる') + '</button><a id="privlink" href="https://nonbi.jp/privacy/" target="_blank" rel="noopener">' + T('プライバシーポリシー') + '</a><div class="langSwitch"><button class="globeBtn" onclick="toggleLang()" aria-label="Language">' + SVG_GLOBE + '</button>' + (__langMenu ? '<div class="langMenu"><button class="lmItem' + (LANG() === 'ja' ? ' on' : '') + '" onclick="setLang(\'ja\')">日本語' + (LANG() === 'ja' ? '<span class="lmCk">✓</span>' : '') + '</button><button class="lmItem' + (LANG() === 'en' ? ' on' : '') + '" onclick="setLang(\'en\')">English' + (LANG() === 'en' ? '<span class="lmCk">✓</span>' : '') + '</button></div>' : '') + '</div>'
       + '';
   } else if(s.screen==='gate'){
     setBot('sz-resS', 'idle');
@@ -369,9 +368,6 @@ function render(){ syncArea();
       + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + SVG_LIST + ' ' + T('プロファイル') + '</div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
       + (pl.length ? pl.map(function(p, i){ return '<div class="profrow"><button class="profmain" onclick="applyProfile(' + i + ')"><b>' + p.name + '</b><span>' + ansSummary(p.ans) + '</span></button><button class="profshare" onclick="shareProf(' + i + ')">' + T('シェア') + '</button><button class="profpub' + (p.pubId ? ' on' : '') + '" onclick="togglePublish(' + i + ')">' + (p.pubId ? T('公開中') : T('公開')) + '</button><button class="profdel" onclick="delProfile(' + i + ')" aria-label="del">✕</button></div>'; }).join('') : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:14px 6px 20px;line-height:1.8">' + T('まだプロファイルがないよ') + '<br>' + T('検索結果の画面で「この条件をプロファイルに保存」から作れるよ') + '</div>')
-      + '<div class="stnbox"><div class="stnt">' + T('よく使うエリア') + '</div>'
-      + '<button class="stnrow" onclick="pickStation(\'home\')"><span class="stnlab">' + SVG_HOME + T('家のエリア') + '</span><b>' + stnh + '</b></button>'
-      + '<button class="stnrow" onclick="pickStation(\'work\')"><span class="stnlab">' + SVG_BLDG + T('職場のエリア') + '</span><b>' + stnw + '</b></button></div>'
       + '</div>';
   } else if(s.screen==='rank'){
     setBot('sz-resS', 'idle');
@@ -400,7 +396,7 @@ function render(){ syncArea();
     setBot('sz-resS', 'idle');
     var sp = s.sharedProf;
     var spRows = '';
-    if(sp){ QS.forEach(function(q){ var v = sp.ans ? sp.ans[q.k] : null; var lab = ''; q.opts.forEach(function(o){ if(o[0] === v) lab = o[1]; }); if(lab) spRows += '<div class=\"sharow\"><span>' + q.k + '</span><b>' + lab + '</b></div>'; }); }
+    if(sp){ QS.forEach(function(q){ var v = sp.ans ? sp.ans[q.k] : null; var lab = ''; if(v) lab = v; if(lab) spRows += '<div class=\"sharow\"><span>' + q.k + '</span><b>' + lab + '</b></div>'; }); }
     h = '<button class="backbtn" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
       + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('共有されたプロファイル') + '</div>'
@@ -432,10 +428,8 @@ function render(){ syncArea();
       : '<div style=\"text-align:center;color:#8a6d3f;font-weight:700;padding:20px 6px;line-height:1.8\">' + T('まだデータが少ないよ') + '<br>' + T('お気に入りや「行った！」が増えると、人気順に並ぶよ') + '</div>';
     var featHtml = '<div class=\"commsec\">' + T('特集') + '</div>' + FEATS.map(function(f){ return '<div class=\"logrow rkrow\" onclick=\"goFeat(\'' + f.id + '\')\"><div class=\"lgmain\"><div class=\"lgname\">' + T(f.t) + '</div><div class=\"lgmeta\">' + T(f.d) + ' · ' + featCount(f.id) + T('軒') + '</div></div><span class=\"chev\">›</span></div>'; }).join('');
     var areaHtml = Object.keys(AREAINFO).map(function(k){ return '<div class=\"logrow rkrow\" onclick=\"openAreaRank(\'' + k + '\')\"><div class=\"lgmain\"><div class=\"lgname\">' + aname(k) + '</div><div class=\"lgmeta\">' + AREAS[k].length + T('軒') + '</div></div><span class=\"chev\">›</span></div>'; }).join('');
-    h = '<button class=\"backbtn\" onclick=\"go(\'idle\')\">' + T('← もどる') + '</button>'
-      + '<div class=\"backzone\" onclick=\"go(\'idle\')\"></div>'
-      + '<div class=\"say\" style=\"top:88px;left:88px;right:10px;text-align:left;font-size:16.5px\">' + T('コミュニティ') + '</div>'
-      + '<div class=\"sheet\" style=\"top:150px\"><div class=\"grip\"></div>'
+    h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><button class="backbtn" style="top:10px;left:10px" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
+      + '<div style="margin-top:64px;font-weight:800;font-size:20px;color:#111">' + T('コミュニティ') + '</div>'
       + '<div style=\"font-size:12.5px;color:#8a6d3f;font-weight:700;margin-bottom:4px\">' + T('みんなのお気に入りと「行った！」を匿名で集計') + '</div>'
       + '<div class=\"commsec\">' + T('みんなの人気店') + ' TOP10</div>' + topHtml
       + '<div class=\"commsec\">' + T('エリア別ランキング') + '</div>' + areaHtml + featHtml
@@ -493,6 +487,7 @@ function render(){ syncArea();
       + '</div>';
   } else if(s.screen==='account'){
     setBot('sz-resS', 'idle');
+    var stnh = (window.__S.stn && window.__S.stn.home) ? aname(window.__S.stn.home) : T('設定しない'); var stnw = (window.__S.stn && window.__S.stn.work) ? aname(window.__S.stn.work) : T('設定しない');
     var au = USER();
     h = '<button class="backbtn" style="font-size:14.5px;padding:9px 16px 9px 13px" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'idle\')"></div>'
@@ -513,6 +508,9 @@ function render(){ syncArea();
               + '<div class=\"acctnote\">' + T('メールのリンクからもログインできるよ') + ' <span style="text-decoration:underline" onclick="emBack()">' + T('メールを変える') + '</span></div>'
             : '<div class=\"emrow\"><input id=\"emaddr\" type=\"email\" inputmode=\"email\" placeholder=\"' + T('メールアドレス') + '\"><button class=\"embtn\" onclick=\"doEmail()\">' + T('コードを送る') + '</button></div>')
           + '<div class="acctnote">' + T('いまは、この端末の中に保存されているよ。') + '</div><div class="acctdiv2"></div><button class="mrow" style="padding:4px 2px" onclick="go(\'log\')"><span class="mic">' + SVG_STAMP + '</span><span class="mlb">' + T('飲みログ') + '</span>' + (totalVisits() ? '<span class="lgbadge">' + totalVisits() + '</span>' : '') + '<span class="chev">›</span></button></div>')
+      + '<div class="stnbox" style="margin-top:12px"><div class="stnt">' + T('よく使うエリア') + '</div>'
+      + '<button class="stnrow" onclick="pickStation(\'home\')"><span class="stnlab">' + SVG_HOME + T('家のエリア') + '</span><b>' + stnh + '</b></button>'
+      + '<button class="stnrow" onclick="pickStation(\'work\')"><span class="stnlab">' + SVG_BLDG + T('職場のエリア') + '</span><b>' + stnw + '</b></button></div>'
       + '</div>';
   } else if(s.screen==='detail'){
     setBot('sz-res', 'idle');
@@ -532,7 +530,8 @@ function render(){ syncArea();
       + (sh.t ? '<a class="btn tel" href="tel:'+sh.t.replace(/-/g,'')+'">' + T('電話する') + '</a>' : '<span class="btn off">' + T('電話 未確認') + '</span>')
       + '<button class="btn map" onclick="setPick(true)">' + T('地図を開く') + '</button>'
       + '<button class="btn favb" onclick="toggleFav(\'' + AREAKEY + '\',\'' + sh.n.replace(/'/g, "\\'") + '\')">' + (favHas(AREAKEY, sh.n) ? SVG_BMK + ' ' + T('お気に入り済み') : SVG_BMK_LINE + ' ' + T('お気に入り')) + '</button></div>'
-      + '</div>';
+      + '</div>'
+      + '<a class="gmaplink" target="_blank" rel="noopener" href="' + (sh.pid ? 'https://www.google.com/maps/place/?q=place_id:' + sh.pid : mapUrl('google', sh.n + ' ' + areaName())) + '">' + T('Googleマップでお店を見る') + '</a>';
   }
   if(s.pick && s.shop !== null && s.shop !== undefined){
     var sh2 = SHOPS[s.shop];
@@ -551,17 +550,22 @@ function render(){ syncArea();
   }
   if(s.showAreas){
     var stnMode = !!s.stnPick;
+    var stnQuick = (!stnMode && window.__S.stn && (window.__S.stn.home || window.__S.stn.work)) ? ((window.__S.stn.home ? '<button class="prow" onclick="gotoStation(\'home\')">' + T('家のエリア') + '：' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn.work ? '<button class="prow" onclick="gotoStation(\'work\')">' + T('職場のエリア') + '：' + aname(window.__S.stn.work) + '</button>' : '')) : '';
     h += '<div class="pickwrap"><div class="pick"><h3>' + (stnMode ? (s.stnPick === 'home' ? T('家のエリア') : T('職場のエリア')) : T('エリアを選ぶ')) + '</h3>'
-      + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ var cur = stnMode ? (window.__S.stn && window.__S.stn[s.stnPick] === k) : (AREAKEY === k); return '<button class="prow' + (cur ? ' on' : '') + '" onclick="' + (stnMode ? 'chooseStation(\'' + k + '\')' : 'pickArea(\'' + k + '\')') + '">' + aname(k) + '<span class="acnt">' + AREAS[k].length + T('軒') + '</span></button>'; }).join('')
+      + stnQuick + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ var cur = stnMode ? (window.__S.stn && window.__S.stn[s.stnPick] === k) : (AREAKEY === k); return '<button class="prow' + (cur ? ' on' : '') + '" onclick="' + (stnMode ? 'chooseStation(\'' + k + '\')' : 'pickArea(\'' + k + '\')') + '">' + aname(k) + '<span class="acnt">' + AREAS[k].length + T('軒') + '</span></button>'; }).join('')
       + (stnMode ? '<button class="prow" onclick="chooseStation(\'\')">' + T('設定しない') + '</button>' : '')
       + '<button class="pcancel" onclick="window.__S.stnPick=null;toggleAreas()">' + T('キャンセル') + '</button></div></div>';
   }
   ui.innerHTML = h; window.__prevScr = s.screen;
+  var __tb = document.getElementById('tabbar');
+  var __tbOn = {idle:1, ask:1, results:1, detail:1, account:1, fav:1, prof:1, log:1, reg:1, comm:1, rank:1, feat:1, review:1, pshare:1, shared:1, pubboard:1};
+  if(__tbOn[s.screen] && !s.pick && !s.showAreas && !s.sharePick){ if(!__tb){ __tb = document.createElement('div'); __tb.id = 'tabbar'; __tb.className = 'tabbar'; ph.appendChild(__tb); } var __act = s.screen === 'reg' ? 0 : (s.screen === 'comm' || s.screen === 'rank' || s.screen === 'feat' || s.screen === 'pubboard') ? 1 : (s.screen === 'account' || s.screen === 'fav' || s.screen === 'prof' || s.screen === 'log' || s.screen === 'review' || s.screen === 'pshare' || s.screen === 'shared') ? 2 : -1; __tb.innerHTML = '<button class="tbtn' + (__act === 0 ? ' on' : '') + '" onclick="go(\'reg\')">' + SVG_STAMP + '<span>' + T('常連') + '</span></button><button class="tbtn' + (__act === 1 ? ' on' : '') + '" onclick="goCommunity()">' + SVG_USERS + '<span>' + T('コミュニティ') + '</span></button><button class="tbtn' + (__act === 2 ? ' on' : '') + '" onclick="go(\'account\')">' + SVG_USER + '<span>' + (__user ? T('マイページ') : T('ログイン')) + '</span></button>'; __tb.style.display = 'flex'; }
+  else if(__tb){ __tb.style.display = 'none'; }
   var bl = document.getElementById('botlayer'); if(bl) bl.style.display = (s.screen==='map') ? 'none' : 'block';
   var gb = document.getElementById('gmapbtn'); if(gb) gb.style.display = (s.screen==='results') ? 'flex' : 'none';
   if(s.screen==='map'){ initGMap(); }
   if(s.screen==='detail'){ prepPoster(); }
-  if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=880)?330:(H>=720)?300:Math.min(220,H*0.36); var bt=(H>=720)?Math.max(164,H*0.19):164; var bwCap=(H-232-bt)/1.3327; if(bwCap<bw){ bw=bwCap; var bwr=document.getElementById('botwrap'); if(bwr) bwr.style.width=bw+'px'; } hs.style.top=(bt+bw*1.3327+14)+'px'; setTimeout(function(){ var hs2=document.getElementById('homesay'); var bw3=document.getElementById('botwrap'); if(!hs2||!bw3) return; var cs3=getComputedStyle(bw3); var w3=parseFloat(cs3.width), t3=parseFloat(cs3.top); if(w3>0){ hs2.style.top=(t3+w3*1.3327+14)+'px'; } var pv2=document.getElementById('privlink'); var tb3=document.querySelector('.homerow'); if(pv2&&tb3) pv2.style.bottom=(tb3.offsetHeight+5)+'px'; var pb2=document.querySelector('.pillbtn'); var tb2=document.querySelector('.homerow'); if(pb2&&tb2){ var H2=ph.clientHeight||640; var sayB2=hs2.offsetTop+hs2.offsetHeight; var b202=H2-sayB2-20-pb2.offsetHeight; var minB2=tb2.offsetHeight+34; pb2.style.bottom=Math.max(minB2, Math.min(b202, minB2+56))+'px'; } }, 400); var pb=document.querySelector('.pillbtn'); var tb=document.querySelector('.homerow'); if(pb&&tb){ var sayB=hs.offsetTop+hs.offsetHeight; var b20=H-sayB-20-pb.offsetHeight; var minB=tb.offsetHeight+34; pb.style.bottom=Math.max(minB, Math.min(b20, minB+56))+'px'; } } }
+  if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=880)?330:(H>=720)?300:Math.min(220,H*0.36); var bt=(H>=720)?Math.max(164,H*0.19):164; var bwCap=(H-232-bt)/1.3327; if(bwCap<bw){ bw=bwCap; var bwr=document.getElementById('botwrap'); if(bwr) bwr.style.width=bw+'px'; } hs.style.top=(bt+bw*1.3327+14)+'px'; setTimeout(function(){ var hs2=document.getElementById('homesay'); var bw3=document.getElementById('botwrap'); if(!hs2||!bw3) return; var cs3=getComputedStyle(bw3); var w3=parseFloat(cs3.width), t3=parseFloat(cs3.top); if(w3>0){ hs2.style.top=(t3+w3*1.3327+14)+'px'; } var pv2=document.getElementById('privlink'); var tb3=document.querySelector('.tabbar'); if(pv2&&tb3) pv2.style.bottom=(tb3.offsetHeight+5)+'px'; var pb2=document.querySelector('.pillbtn'); var tb2=document.querySelector('.tabbar'); if(pb2&&tb2){ var H2=ph.clientHeight||640; var sayB2=hs2.offsetTop+hs2.offsetHeight; var b202=H2-sayB2-20-pb2.offsetHeight; var minB2=tb2.offsetHeight+34; pb2.style.bottom=Math.max(minB2, Math.min(b202, minB2+56))+'px'; } }, 400); var pb=document.querySelector('.pillbtn'); var tb=document.querySelector('.tabbar'); if(pb&&tb){ var sayB=hs.offsetTop+hs.offsetHeight; var b20=H-sayB-20-pb.offsetHeight; var minB=tb.offsetHeight+34; pb.style.bottom=Math.max(minB, Math.min(b20, minB+56))+'px'; } } }
 }
 var __stats = null;
 function loadStats(){ if(!__sb) return; __sb.from('shop_stats').select('a,n,fav_users,visit_count').then(function(r){ if(r && r.data){ var m = {}; r.data.forEach(function(x){ m[x.a + '|' + x.n] = x; }); __stats = m; var sc = window.__S.screen; if(sc === 'results' || sc === 'detail' || sc === 'rank') render(); } }); }
@@ -642,10 +646,11 @@ function regCount(){ var seen = {}; (window.__S.logs || []).forEach(function(e){
 function regList(){ var cnt = {}, last = {}; (window.__S.logs || []).forEach(function(e){ var k = e.a + ':' + e.n; cnt[k] = (cnt[k] || 0) + 1; if(!last[k] || e.d > last[k]) last[k] = e.d; }); return Object.keys(cnt).map(function(k){ var ix = k.indexOf(':'); return {a: k.slice(0, ix), n: k.slice(ix + 1), c: cnt[k], d: last[k]}; }).sort(function(x, y){ return (y.c - x.c) || ((y.d > x.d) ? 1 : -1); }); }
 function openRegShop(a, i){ sndOpen(); tryLocate(); window.__S.area = a; syncArea(); window.__S.ret = 'reg'; window.__S.shop = i; window.__S.screen = 'detail'; save(); render(); }
 function rateStr(sh){ var p = []; if(sh.gs) p.push('Google ★' + sh.gs); if(sh.ts) p.push('食べログ ' + sh.ts); return p.join(' / '); }
-function shareResultsLine(){ var S = window.__S; var names = []; (S.order || []).slice(0, 3).forEach(function(ix, j){ var sh = SHOPS[ix]; if(sh) names.push((j + 1) + '. ' + sh.n + (rateStr(sh) ? '（' + rateStr(sh) + '）' : '')); }); var payload = {n: areaName() + 'のイチオシ', a: AREAKEY, ans: S.ans}; var b64 = ''; try{ b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }catch(e){} var url = location.origin + location.pathname + (b64 ? ('?p=' + b64) : ''); var txt = '今夜ここどう？🍺 のんびーで見つけた' + areaName() + 'のお店\n' + names.join('\n') + '\n条件もそのまま見られるよ👇\n' + url; window.open('https://line.me/R/msg/text/?' + encodeURIComponent(txt), '_blank'); }
+function shareResultsLine(){ var S = window.__S; var names = []; (S.order || []).slice(0, 3).forEach(function(ix, j){ var sh = SHOPS[ix]; if(sh) names.push((j + 1) + '. ' + sh.n + (rateStr(sh) ? '（' + rateStr(sh) + '）' : '')); }); var b64 = profCode(areaName() + 'のイチオシ', AREAKEY, S.ans); var url = location.origin + location.pathname + (b64 ? ('?p=' + b64) : ''); var txt = '今夜ここどう？🍺 のんびーで見つけた' + areaName() + 'のお店\n' + names.join('\n') + '\n条件もそのまま見られるよ👇\n' + url; window.open('https://line.me/R/msg/text/?' + encodeURIComponent(txt), '_blank'); }
 function shareShopLine(){ var sh = SHOPS[window.__S.shop]; if(!sh) return; var url = location.origin + location.pathname + '?s=' + AREAKEY + '-' + sh.id; var txt = '今夜ここどう？🍺\n' + sh.n + '（' + areaName() + '）\n' + rateStr(sh) + (sh.b ? ' / ' + sh.b : '') + '\nのんびーで見つけたよ👇\n' + url; window.open('https://line.me/R/msg/text/?' + encodeURIComponent(txt), '_blank'); }
 function shareShopMenu(){ window.__S.shareOpen = !window.__S.shareOpen; save(); render(); }
-function shareProf(i){ var p = (window.__S.profs || [])[i]; if(!p) return; var payload = {n: p.name, a: window.__S.area, ans: p.ans}; var b64 = ''; try{ b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }catch(e){ return; } var url = location.origin + location.pathname + '?p=' + b64; if(navigator.share){ navigator.share({title: 'のんびー', url: url}).catch(function(){}); } else if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){ toast(T('リンクをコピーしたよ')); }, function(){ toast(url); }); } else { toast(url); } }
+function profCode(n, a, ans){ var codes = QS.map(function(q){ var v = ans ? ans[q.k] : null; if(!v) return '-'; var ix = -1; q.opts.forEach(function(o, i){ if(o[1] === v) ix = i; }); return ix < 0 ? '-' : String(ix); }).join(''); var raw = '2.' + a + '.' + codes + '.' + String(n || ''); try{ return btoa(unescape(encodeURIComponent(raw))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }catch(e){ return ''; } }
+function shareProf(i){ var p = (window.__S.profs || [])[i]; if(!p) return; var b64 = profCode(p.name, window.__S.area, p.ans); if(!b64){ toast(T('リンクが正しくないみたい')); return; } var url = location.origin + location.pathname + '?p=' + b64; if(navigator.share){ navigator.share({title: 'のんびー', url: url}).catch(function(){}); } else if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){ toast(T('リンクをコピーしたよ')); }, function(){ toast(url); }); } else { toast(url); } }
 function badProfName(n){ var t = (n || '').toLowerCase(); if(t.length > 20) return true; var bad = ['http', 'www', '.com', '@', '出会', 'エロ', 'セックス', 'アダルト', '副業', '稼げ', '電話番号', '連絡先']; for(var i = 0; i < bad.length; i++){ if(t.indexOf(bad[i]) >= 0) return true; } return false; }
 function togglePublish(i){ var p = (window.__S.profs || [])[i]; if(!p || !__sb || !__user) return; sndTap();
   if(p.pubId){ __sb.from('pub_profiles').delete().eq('id', p.pubId).then(function(r){ if(r && r.error){ toast(T('うまくいかなかったよ')); return; } delete p.pubId; save(); render(); toast(T('公開を取り下げたよ')); }); return; }
@@ -656,8 +661,8 @@ function goPubBoard(){ go('pubboard'); loadPubs(); }
 function loadPubs(){ if(!__sb) return; __sb.from('pub_profiles').select('id,name,area,ans,uses').order('uses', {ascending: false}).limit(30).then(function(r){ if(r && r.data){ __pubs = r.data; if(window.__S.screen === 'pubboard') render(); } }); }
 function usePubProfile(ix){ var p = (__pubs || [])[ix]; if(!p) return; sndTap(); if(p.id && __sb) __sb.rpc('bump_profile_uses', {pid: p.id}).then(function(){}); window.__S.area = p.area; syncArea(); window.__S.ans = JSON.parse(JSON.stringify(p.ans)); window.__S.screen = 'think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.profSave = false; window.__S.ret = 'results'; save(); render(); }, 1700); }
 function savePubProfile(ix){ var p = (__pubs || [])[ix]; if(!p) return; var S = window.__S; if(!S.profs) S.profs = []; S.profs.push({name: p.name, ans: JSON.parse(JSON.stringify(p.ans))}); save(); toast(T('プロファイルを保存したよ')); if(p.id && __sb) __sb.rpc('bump_profile_uses', {pid: p.id}).then(function(){}); }
-function applySharedProf(){ var sp = window.__S.sharedProf; if(!sp) return; sndTap(); window.__S.area = sp.a; syncArea(); window.__S.ans = JSON.parse(JSON.stringify(sp.ans)); window.__S.screen = 'think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.profSave = false; window.__S.ret = 'results'; save(); render(); }, 1700); }
-function saveSharedProf(){ var sp = window.__S.sharedProf; if(!sp) return; var S = window.__S; if(!S.profs) S.profs = []; S.profs.push({name: sp.n, ans: JSON.parse(JSON.stringify(sp.ans))}); toast(T('プロファイルを保存したよ')); save(); go('prof'); }
+function applySharedProf(){ var sp = window.__S.sharedProf; if(!sp) return; if(requireLogin()) return; sndTap(); window.__S.area = sp.a; syncArea(); window.__S.ans = JSON.parse(JSON.stringify(sp.ans)); window.__S.screen = 'think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.profSave = false; window.__S.ret = 'results'; save(); render(); }, 1700); }
+function saveSharedProf(){ var sp = window.__S.sharedProf; if(!sp) return; if(requireLogin()) return; var S = window.__S; if(!S.profs) S.profs = []; S.profs.push({name: sp.n, ans: JSON.parse(JSON.stringify(sp.ans))}); toast(T('プロファイルを保存したよ')); save(); go('prof'); }
 function goCommunity(){ go('comm'); }
 function openCommShop(a, i){ sndOpen(); tryLocate(); window.__S.area = a; syncArea(); window.__S.ret = 'comm'; window.__S.shop = i; window.__S.screen = 'detail'; save(); render(); }
 function openAreaRank(k){ sndTap(); window.__S.area = k; syncArea(); window.__S.screen = 'rank'; save(); render(); }
@@ -724,7 +729,7 @@ function spawnBurst(cx, cy, n){
   }
 }
 document.addEventListener('pointerdown', function(e){
-  var t = e.target && e.target.closest ? e.target.closest('.bar,.pillbtn,.more,.mapbtn,.card,.prow,.btn,.backbtn,.pcancel,.hbtn,.favheart') : null;
+  var t = e.target && e.target.closest ? e.target.closest('.bar,.pillbtn,.more,.mapbtn,.card,.prow,.btn,.backbtn,.pcancel,.hbtn,.favheart,.tbtn') : null;
   if(t) spawnBurst(e.clientX, e.clientY, 7);
 });
 function botHop(){
@@ -785,6 +790,7 @@ function wrapText(ctx, text, x, y, maxW, lh, maxLines){ var chars = text.split('
 async function makePoster(sh, url){
   var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
   var ctx = cv.getContext('2d');
+  try{ await Promise.all([document.fonts.load('500 31px "M PLUS Rounded 1c"'), document.fonts.load('700 27px "M PLUS Rounded 1c"'), document.fonts.load('800 56px "M PLUS Rounded 1c"')]); }catch(e){}
   ctx.fillStyle = '#fff9ef'; ctx.fillRect(0, 0, 1080, 1350);
   var photoSrc = sh.ph ? (PHB + sh.ph[0]) : (sh.img ? PH[sh.img] : null);
   if(photoSrc){ try{ var pim = await loadImg(photoSrc); var sc = Math.max(1080 / pim.width, 740 / pim.height); var dw = pim.width * sc, dh = pim.height * sc; ctx.drawImage(pim, (1080 - dw) / 2, (740 - dh) / 2, dw, dh); }catch(e){ ctx.fillStyle = '#f3e6cf'; ctx.fillRect(0, 0, 1080, 740); } }
@@ -861,7 +867,7 @@ window.__S = window.hatchWidget.getState(DEF);
 if(!window.__S.lang){ window.__S.lang = ((navigator.language || 'ja').toLowerCase().indexOf('en') === 0) ? 'en' : 'ja'; }
 (function(){ try{ var m = /[?&]s=([a-z]+)-(\d+)/.exec(location.search) || /#s=([a-z]+)-(\d+)/.exec(location.hash); if(m && AREAS[m[1]]){ var idx = -1; for(var i = 0; i < AREAS[m[1]].length; i++){ if(AREAS[m[1]][i].id === parseInt(m[2], 10)){ idx = i; break; } } if(idx >= 0){ window.__S.area = m[1]; window.__S.shop = idx; window.__S.screen = 'detail'; } } }catch(e){} })();
 (function(){ try{ var m = /[?&]f=([a-z0-9:,\-]+)/.exec(location.search) || /#f=([a-z0-9:,\-]+)/.exec(location.hash); if(m){ var out = []; m[1].split(',').forEach(function(pr){ var mm = /^([a-z]+)-(\d+)$/.exec(pr); if(mm && AREAS[mm[1]]){ var id = parseInt(mm[2], 10); for(var i = 0; i < AREAS[mm[1]].length; i++){ if(AREAS[mm[1]][i].id === id){ out.push({a: mm[1], i: i}); break; } } } }); if(out.length){ window.__S.shared = out; window.__S.screen = 'shared'; } } }catch(e){} })();
-(function(){ try{ var m = /[?&]p=([A-Za-z0-9_-]+)/.exec(location.search) || /#p=([A-Za-z0-9_-]+)/.exec(location.hash); if(m){ var js = decodeURIComponent(escape(atob(m[1].replace(/-/g, '+').replace(/_/g, '/')))); var o = JSON.parse(js); if(o && o.n && AREAS[o.a] && o.ans){ window.__S.sharedProf = {n: String(o.n).slice(0, 40), a: o.a, ans: o.ans}; window.__S.screen = 'pshare'; } } }catch(e){} })();
+(function(){ try{ var m = /[?&]p=([A-Za-z0-9_-]+)/.exec(location.search) || /#p=([A-Za-z0-9_-]+)/.exec(location.hash); if(m){ var js = decodeURIComponent(escape(atob(m[1].replace(/-/g, '+').replace(/_/g, '/')))); if(js.indexOf('2.') === 0){ var pp = js.split('.'); var cans = {}; (pp[2] || '').split('').forEach(function(c, ci){ if(c !== '-' && QS[ci]){ var oo = QS[ci].opts[parseInt(c, 10)]; if(oo) cans[QS[ci].k] = oo[1]; } }); if(AREAS[pp[1]]){ window.__S.sharedProf = {n: pp.slice(3).join('.').slice(0, 40) || 'シェア', a: pp[1], ans: cans}; window.__S.screen = 'pshare'; } } else { var o = JSON.parse(js); if(o && o.n && AREAS[o.a] && o.ans){ window.__S.sharedProf = {n: String(o.n).slice(0, 40), a: o.a, ans: o.ans}; window.__S.screen = 'pshare'; } } } }catch(e){} })();
 syncArea();
 setTimeout(tryLocate, 600);
 document.getElementById('botlayer').innerHTML = botHtml();
@@ -869,6 +875,14 @@ botState.vid = 'idle';
 render();
 </script>
 <style>
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:28;background:#fffdf7;border-top:2px solid #17130c;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:4px}
+.tbtn{flex:1;background:none;border:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0 3px;font-size:11px;font-weight:800;color:#8a6d3f;cursor:pointer;border-radius:12px}
+.tbtn svg{width:22px;height:22px;fill:#8a6d3f}
+.tbtn.on{color:#ff7a00}
+.tbtn.on svg{fill:#ff7a00}
+.gmaplink{display:block;text-align:center;margin-top:12px;padding:11px;border:1.8px solid #17130c;border-radius:12px;font-weight:800;font-size:14px;color:#17130c;background:#fff;text-decoration:none}
+.pick{max-height:calc(100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet{padding-bottom:88px}
 .sdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:9px;vertical-align:1px}
 
 .bar,.pillbtn,.more,.mapbtn,.card,.backbtn{transition:transform .13s ease}
