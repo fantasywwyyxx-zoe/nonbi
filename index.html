@@ -168,7 +168,7 @@ var EN = {
 '厳選マップ':'Curated Map','軒':' spots','◎ 現在地':'◎ My location','（写真は準備中）':'(Photo coming soon)',
 '飲み放題あり':'All-you-can-drink','住所':'Address','営業':'Hours','予算':'Budget','酒':'Drinks',
 '電話する':'Call','電話 未確認':'No phone listed','地図を開く':'Open in Maps',
-'どのマップで開く？':'Open with which map?','シェアする':'Share','画像でシェア':'Share image','Instagramでシェア':'Share on Instagram','キャプションをコピーしたよ。Instagramに貼ってね':'Caption copied — paste it on Instagram','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
+'どのマップで開く？':'Open with which map?','シェアする':'Share','画像でシェア':'Share image','Threadsでシェア':'Share on Threads','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
 '約':'~','飲み屋':'Izakaya','Googleと食べログの高評価だけを厳選':'Only top-rated spots from Google & Tabelog',
 'ポスターを作ってるよ…':'Making your poster…','画像は長押しで写真に保存できます':'Long-press the image to save it to your photos',
 'シェアする':'Share','リンクをコピー':'Copy link','閉じる':'Close','ごめん、作れなかった…':'Sorry, that did not work…','リンクをコピーしました':'Link copied',
@@ -326,7 +326,7 @@ function render(){ syncArea();
     h = '<button class="backbtn" onclick="backToLastQ()">' + T('← もどる') + '</button>'
       + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('まずこの3軒、どう？') + '</div>'
       + '<div class="sheet" style="top:150px"><div class="grip"></div>'
-      + '<div class="sortrow"><button class="sortbtn' + (near ? '' : ' on') + '" onclick="setSort(\'rec\')">' + T('おすすめ順') + '</button><button class="sortbtn' + (near ? ' on' : '') + '" onclick="setSort(\'near\')">' + T('近い順') + '</button></div>' + '<button class="ranklink" onclick="go(\'rank\')">' + T('人気店ランキング') + ' ›</button>'
+      + '<div class="sortrow"><button class="sortbtn' + (near ? '' : ' on') + '" onclick="setSort(\'rec\')">' + T('おすすめ順') + '</button><button class="sortbtn' + (near ? ' on' : '') + '" onclick="setSort(\'near\')">' + T('近い順') + '</button></div>'
       + '<div class="topacts"><button class="linebtn" onclick="shareResultsLine()">' + T('LINEで送る') + '</button>'
       + (s.profSave ? '<div class="profsave"><input id="profname" maxlength="20" placeholder="' + T('プロファイル名（例：デート）') + '"><button class="pbtn2" onclick="saveProfile()">' + T('保存する') + '</button></div>' : '<button class="saveprof" onclick="openProfSave()">' + SVG_LIST + ' ' + T('この条件をプロファイルに保存') + '</button>')
       + '<div class="resfoot-row"><button class="back" onclick="go(\'idle\')">' + T('← 最初から') + '</button><button class="back" onclick="editAns()">' + T('条件を変える') + '</button></div></div>'
@@ -546,7 +546,7 @@ function render(){ syncArea();
     h += '<div class="pickwrap"><div class="pick"><h3>' + T('シェアする') + '</h3>'
       + '<button class="prow" onclick="setSharePick(false);shareShop()"><span class="sdot" style="background:#ff7a00"></span>' + T('画像でシェア') + '</button>'
       + '<button class="prow" onclick="setSharePick(false);shareShopLine()"><span class="sdot" style="background:#06c755"></span>' + T('LINEで送る') + '</button>'
-      + '<button class="prow" onclick="shareInsta()"><span class="sdot" style="background:#e1306c"></span>' + T('Instagramでシェア') + '</button>'
+      + '<button class="prow" onclick="shareThreads()"><span class="sdot" style="background:#17130c"></span>' + T('Threadsでシェア') + '</button>'
       + '<button class="pcancel" onclick="setSharePick(false)">' + T('キャンセル') + '</button></div></div>';
   }
   if(s.showAreas){
@@ -824,14 +824,11 @@ function showMapCard(i){ var sh = SHOPS[i]; var mc = document.getElementById('ma
 var __posterFile = null, __posterKey = '';
 function prepPoster(){ var sh = SHOPS[window.__S.shop]; if(!sh) return; var key = AREAKEY + '-' + sh.id; if(__posterKey === key) return; __posterKey = key; __posterFile = null; makePoster(sh, shopUrl(sh)).then(function(f){ if(__posterKey === key) __posterFile = f; }).catch(function(){}); }
 function setSharePick(v){ window.__S.sharePick = v; save(); render(); }
-async function shareInsta(){
+function shareThreads(){
   var sh = SHOPS[window.__S.shop]; if(!sh) return; sndTap(); setSharePick(false);
   var url = shopUrl(sh);
-  var cap = sh.n + '\uFF08' + areaName() + '\uFF09' + (rateStr(sh) ? ' ' + rateStr(sh) : '') + '\n' + url;
-  if(navigator.clipboard){ try{ await navigator.clipboard.writeText(cap); toast(T('キャプションをコピーしたよ。Instagramに貼ってね')); }catch(e){} }
-  var key = AREAKEY + '-' + sh.id;
-  if(__posterFile && __posterKey === key && navigator.canShare && navigator.canShare({files: [__posterFile]})){ try{ await navigator.share({files: [__posterFile]}); }catch(e){} return; }
-  openPosterPreview(sh);
+  var txt = sh.n + '\uFF08' + areaName() + '\uFF09' + (rateStr(sh) ? ' ' + rateStr(sh) : '') + '\nのんびーで見つけたよ\n' + url;
+  window.open('https://www.threads.net/intent/post?text=' + encodeURIComponent(txt), '_blank');
 }
 async function shareShop(){
   var sh = SHOPS[window.__S.shop]; if(!sh) return; sndTap();
