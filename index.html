@@ -168,7 +168,7 @@ var EN = {
 '厳選マップ':'Curated Map','軒':' spots','◎ 現在地':'◎ My location','（写真は準備中）':'(Photo coming soon)',
 '飲み放題あり':'All-you-can-drink','住所':'Address','営業':'Hours','予算':'Budget','酒':'Drinks',
 '電話する':'Call','電話 未確認':'No phone listed','地図を開く':'Open in Maps',
-'どのマップで開く？':'Open with which map?','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
+'どのマップで開く？':'Open with which map?','シェアする':'Share','画像でシェア':'Share image','Instagramでシェア':'Share on Instagram','キャプションをコピーしたよ。Instagramに貼ってね':'Caption copied — paste it on Instagram','Google マップ':'Google Maps','Apple マップ':'Apple Maps','Yahoo!マップ':'Yahoo! Maps','キャンセル':'Cancel',
 '約':'~','飲み屋':'Izakaya','Googleと食べログの高評価だけを厳選':'Only top-rated spots from Google & Tabelog',
 'ポスターを作ってるよ…':'Making your poster…','画像は長押しで写真に保存できます':'Long-press the image to save it to your photos',
 'シェアする':'Share','リンクをコピー':'Copy link','閉じる':'Close','ごめん、作れなかった…':'Sorry, that did not work…','リンクをコピーしました':'Link copied',
@@ -219,7 +219,7 @@ function basePos(){ return ME || null; }
 function fmtDist(m){ if(m === null) return ''; if(m < 1000) return T('約') + (Math.round(m / 10) * 10) + 'm'; return T('約') + (m / 1000).toFixed(1) + 'km'; }
 function orderNear(){ var bp = basePos(); return window.__S.order.slice().sort(function(x, y){ var da = havM(bp, shopLL(SHOPS[x])), db = havM(bp, shopLL(SHOPS[y])); if(da === null && db === null) return 0; if(da === null) return 1; if(db === null) return -1; return da - db; }); }
 function setSort(m){ var S = window.__S; S.sortMode = m; if(m === 'near' && !ME && navigator.geolocation){ navigator.geolocation.getCurrentPosition(function(p){ ME = {lat: p.coords.latitude, lng: p.coords.longitude}; if(window.__S.sortMode === 'near') render(); }, function(){}, {timeout: 6000, maximumAge: 600000}); } save(); render(); }
-var DEF = {screen:'idle', step:0, ans:{}, shop:null, pick:false, order:[], shown:3, area:'ike', locTried:false, sortMode:'rec', showAreas:false, favs:[], profs:[], stn:{home:'', work:''}, ret:'results', profSave:false, stnPick:null, logs: [], shared: [], logDel: []};
+var DEF = {screen:'idle', step:0, ans:{}, shop:null, pick:false, sharePick:false, order:[], shown:3, area:'ike', locTried:false, sortMode:'rec', showAreas:false, favs:[], profs:[], stn:{home:'', work:''}, ret:'results', profSave:false, stnPick:null, logs: [], shared: [], logDel: []};
 function mapUrl(kind, q){
   var e = encodeURIComponent(q);
   if(kind==='google') return 'https://www.google.com/maps/search/?api=1&query='+e;
@@ -520,7 +520,7 @@ function render(){ syncArea();
     var nz2 = ' nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4);
     var top2 = sh.img ? '<img src="'+PH[sh.img]+'" style="width:100%;height:118px;object-fit:cover;border-radius:12px">' : (sh.ph ? '<img src="'+PHB+sh.ph[0]+'" style="width:100%;height:118px;object-fit:cover;border-radius:12px">' + (sh.ph.length > 1 ? '<div class="dthumbs">' + sh.ph.slice(1).map(function(f){ return '<img src="'+PHB+f+'">'; }).join('') + '</div>' : '') : '<div class="noimg'+nz2+'" style="height:92px;border-radius:12px">'+dispG(sh)+T('（写真は準備中）')+'</div>');
     h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;display:flex;flex-direction:column;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><button class="backbtn" style="top:10px;left:10px" onclick="go(window.__S.ret||\'results\')">' + T('← もどる') + '</button>' + logFabHtml() + '<div style="position:relative;margin-top:64px"><div>' + top2 + '</div></div>'
-      + '<div style="display:flex;align-items:flex-start;gap:8px;margin-top:7px"><div style="font-weight:800;font-size:18px;color:#111;flex:1">'+sh.n+'</div><button class="sharefab2" onclick="shareShop()" aria-label="シェア"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.4 3.4-1.5 1.5-1-1v6.1h-1.8V6.4l-1 1L8.6 5.9zM5 11.5h3.6v2H7v6.1h10v-6.1h-1.6v-2H19V22H5z" transform="translate(0,-0.5)"/></svg></button></div>'
+      + '<div style="display:flex;align-items:flex-start;gap:8px;margin-top:7px"><div style="font-weight:800;font-size:18px;color:#111;flex:1">'+sh.n+'</div><button class="sharefab2" onclick="setSharePick(true)" aria-label="シェア"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.4 3.4-1.5 1.5-1-1v6.1h-1.8V6.4l-1 1L8.6 5.9zM5 11.5h3.6v2H7v6.1h10v-6.1h-1.6v-2H19V22H5z" transform="translate(0,-0.5)"/></svg></button></div>'
       + '<div class="scores">'
       + (sh.gs ? '<span class="sc g">Google ★'+sh.gs+(sh.gc ? (LANG() === 'en' ? ' ('+sh.gc+' reviews)' : '（'+sh.gc+'件）') : '')+'</span>' : '')
       + (sh.ts ? '<span class="sc t">'+(LANG() === 'en' ? 'Tabelog ' : '食べログ ')+sh.ts+(sh.tc ? (LANG() === 'en' ? ' ('+sh.tc+' reviews)' : '（'+sh.tc+'件）') : '')+'</span>' : '')
@@ -541,6 +541,13 @@ function render(){ syncArea();
       + '<a class="prow" target="_blank" href="'+mapUrl('apple', sh2.n + ' ' + areaName())+'">' + T('Apple マップ') + '</a>'
       + '<a class="prow" target="_blank" href="'+mapUrl('yahoo', sh2.n + ' ' + areaName())+'">' + T('Yahoo!マップ') + '</a>'
       + '<button class="pcancel" onclick="setPick(false)">' + T('キャンセル') + '</button></div></div>';
+  }
+  if(s.sharePick && s.shop !== null && s.shop !== undefined){
+    h += '<div class="pickwrap"><div class="pick"><h3>' + T('シェアする') + '</h3>'
+      + '<button class="prow" onclick="setSharePick(false);shareShop()"><span class="sdot" style="background:#ff7a00"></span>' + T('画像でシェア') + '</button>'
+      + '<button class="prow" onclick="setSharePick(false);shareShopLine()"><span class="sdot" style="background:#06c755"></span>' + T('LINEで送る') + '</button>'
+      + '<button class="prow" onclick="shareInsta()"><span class="sdot" style="background:#e1306c"></span>' + T('Instagramでシェア') + '</button>'
+      + '<button class="pcancel" onclick="setSharePick(false)">' + T('キャンセル') + '</button></div></div>';
   }
   if(s.showAreas){
     var stnMode = !!s.stnPick;
@@ -816,6 +823,16 @@ function drawMarkers(){ if(!__gmap) return; __gmarkers.forEach(function(m){ m.se
 function showMapCard(i){ var sh = SHOPS[i]; var mc = document.getElementById('mapcard'); if(!mc || !sh) return; var im = sh.img ? PH[sh.img] : (sh.ph ? PHB + sh.ph[0] : ''); mc.innerHTML = '<div class="mapcardin">' + (im ? '<img src="' + im + '">' : '') + '<div class="mcb"><div class="nm" style="font-size:16.5px">' + sh.n + '</div><div class="scores">' + badges(sh) + '</div><div class="mt">' + dispG(sh) + ' ｜ ' + sh.a + '</div></div><button class="mapopen" onclick="openShop(' + i + ')">' + T('くわしく') + '</button></div>'; }
 var __posterFile = null, __posterKey = '';
 function prepPoster(){ var sh = SHOPS[window.__S.shop]; if(!sh) return; var key = AREAKEY + '-' + sh.id; if(__posterKey === key) return; __posterKey = key; __posterFile = null; makePoster(sh, shopUrl(sh)).then(function(f){ if(__posterKey === key) __posterFile = f; }).catch(function(){}); }
+function setSharePick(v){ window.__S.sharePick = v; save(); render(); }
+async function shareInsta(){
+  var sh = SHOPS[window.__S.shop]; if(!sh) return; sndTap(); setSharePick(false);
+  var url = shopUrl(sh);
+  var cap = sh.n + '\uFF08' + areaName() + '\uFF09' + (rateStr(sh) ? ' ' + rateStr(sh) : '') + '\n' + url;
+  if(navigator.clipboard){ try{ await navigator.clipboard.writeText(cap); toast(T('キャプションをコピーしたよ。Instagramに貼ってね')); }catch(e){} }
+  var key = AREAKEY + '-' + sh.id;
+  if(__posterFile && __posterKey === key && navigator.canShare && navigator.canShare({files: [__posterFile]})){ try{ await navigator.share({files: [__posterFile]}); }catch(e){} return; }
+  openPosterPreview(sh);
+}
 async function shareShop(){
   var sh = SHOPS[window.__S.shop]; if(!sh) return; sndTap();
   var key = AREAKEY + '-' + sh.id; var url = shopUrl(sh);
@@ -855,6 +872,7 @@ botState.vid = 'idle';
 render();
 </script>
 <style>
+.sdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:9px;vertical-align:1px}
 
 .bar,.pillbtn,.more,.mapbtn,.card,.backbtn{transition:transform .13s ease}
 .bar:active{transform:scale(.965)}
