@@ -625,7 +625,7 @@ function setUser(u){ if(!u){ __user = null; return; } if(__user && __user.id ===
 function authInit(){ if(!__sb) return; __sb.auth.getSession().then(function(r){ __authDone = true; if(r && r.data && r.data.session) setUser(r.data.session.user); else render(); });
   __sb.auth.onAuthStateChange(function(ev, sess){ if(sess && sess.user) setUser(sess.user); else if(ev === 'SIGNED_OUT'){ __user = null; render(); } }); }
 function doGoogle(){ if(!__sb){ toast(T('接続を確認してね')); return; } __sb.auth.signInWithOAuth({provider: 'google', options: {redirectTo: location.origin + location.pathname}}).then(function(r){ if(r && r.error) toast(T('接続を確認してね')); }); }
-function doLine(){ if(!__sb){ toast(T('接続を確認してね')); return; } __sb.auth.signInWithOAuth({provider: 'custom:line', options: {redirectTo: location.origin + location.pathname}}).then(function(r){ if(r && r.error) toast(T('接続を確認してね')); }); }
+function doLine(){ sndTap(); location.href = SB_URL + '/functions/v1/line-login/start'; }
 var __emStep = 0, __emAddr = '';
 function doEmail(){ if(!__sb){ toast(T('接続を確認してね')); return; } var el = document.getElementById('emaddr'); var v = ((el && el.value) || '').trim(); if(!v || v.indexOf('@') < 1){ toast(T('メールアドレスを入れてね')); return; } __sb.auth.signInWithOtp({email: v, options: {emailRedirectTo: location.origin + location.pathname}}).then(function(r){ if(r && r.error) toast(T('接続を確認してね')); else { __emAddr = v.replace(/[<>&"']/g, ''); __emStep = 1; render(); toast(T('コードを送ったよ')); } }); }
 function doCode(){ if(!__sb){ toast(T('接続を確認してね')); return; } var el = document.getElementById('emcode'); var c = ((el && el.value) || '').replace(/\D/g, ''); if(c.length < 6){ toast(T('6桁のコードを入れてね')); return; } __sb.auth.verifyOtp({email: __emAddr, token: c, type: 'email'}).then(function(r){ if(r && r.error) toast(T('コードが違うか、期限切れみたい')); else { __emStep = 0; __emAddr = ''; toast(T('ログインしたよ')); } }); }
@@ -673,7 +673,10 @@ function featTest(id, a, sh){ var tx = (sh.g || '') + (sh.w || '') + (sh.s || ''
 function featList(id){ var out = []; Object.keys(AREAS).forEach(function(a){ AREAS[a].forEach(function(sh, i){ if(featTest(id, a, sh)) out.push({a: a, i: i, sh: sh}); }); }); out.sort(function(x, y){ return ((y.sh.ts || 0) + (y.sh.gs || 0)) - ((x.sh.ts || 0) + (x.sh.gs || 0)); }); return out.slice(0, 30); }
 function featCount(id){ var n = 0; Object.keys(AREAS).forEach(function(a){ AREAS[a].forEach(function(sh){ if(featTest(id, a, sh)) n++; }); }); return n; }
 function goProf(){ if(__user){ go('prof'); } else { toast(T('プロファイルはログインすると使えるよ')); go('account'); } }
-setTimeout(authInit, 60);
+function lineReturn(){ try{ var h = location.hash || ''; var m1 = h.match(/line_at=([^&]+)/); var m2 = h.match(/line_rt=([^&]+)/); if(m1 && m2 && __sb){ history.replaceState(null, '', location.pathname + location.search); return __sb.auth.setSession({access_token: decodeURIComponent(m1[1]), refresh_token: decodeURIComponent(m2[1])}); } }catch(e){} return null; }
+var __lrp = lineReturn();
+if(__lrp && __lrp.then) __lrp.then(function(){ setTimeout(authInit, 10); }, function(){ setTimeout(authInit, 10); });
+else setTimeout(authInit, 60);
 
 (function(){ function bl(){ var ep = document.getElementById('eyepatch'); if(!ep){ setTimeout(bl, 1200); return; } ep.classList.add('blink'); setTimeout(function(){ ep.classList.remove('blink'); }, 130); setTimeout(bl, 2600 + Math.random()*2400); } setTimeout(bl, 1600); })();
 
