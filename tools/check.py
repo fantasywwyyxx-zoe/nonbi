@@ -172,6 +172,7 @@ ok("hashTagsHtml" in html and "undoToday" in html and "logDel" in html, "v86: ha
 ok("nakano" in html and len(NA) == 114, "v86: nakano area live")
 ok("openCommShop" in html and "openAreaRank" in html, "v87: community screen live")
 ok("shareProf" in html and "applySharedProf" in html, "v89: profile sharing live")
+ok("shareResultsLine" in html and "shareShopLine" in html and "screen==='gate'" in html and "screen==='reg'" in html, "v90: login gate, regulars, LINE share live")
 ok("logVisit" in html and "logstrip" in html and "pushLogs" in html and "飲みログ" in html, "v82: drink log + stamps")
 ok("shop_stats" in html and "shareFavs" in html and "importShared" in html, "v83: popularity stats + shared favorites")
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
