@@ -361,7 +361,7 @@ function render(){ syncArea();
   } else if(s.screen==='pubdetail'){
     setBot('sz-rR', 'idle');
     var pd = (__pubs || [])[s.pubSel || 0] || null;
-    var pdRows = pd ? '<div class="kv">' + QS.map(function(q){ var v = pd.ans ? pd.ans[q.k] : null; return '<div class="krow"><b>' + T(q.q) + '</b><span>' + (v ? String(v).replace(/</g, '&lt;') : T('指定なし')) + '</span></div>'; }).join('') + '</div>' : '';
+    var pdRows = pd ? '<div>' + QS.map(function(q){ var v = pd.ans ? pd.ans[q.k] : null; return '<div class="pdrow"><div class="pdq">' + T(q.q) + '</div><div class="pdv">' + (v ? String(v).replace(/</g, '&lt;') : T('指定なし')) + '</div></div>'; }).join('') + '</div>' : '';
     h = '<button class="backbtn" onclick="go(\'pubboard\')">' + T('← もどる') + '</button>'
       + '<div class="backzone" onclick="go(\'pubboard\')"></div>'
       + '<div class="say" style="top:70px;left:16px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + (pd ? String(pd.name).replace(/</g, '&lt;') : T('プロファイル')) + '</span><div class="subline">' + (pd ? aname(pd.area) + (pd.uses ? ' · ' + pd.uses + (LANG() === 'en' ? ' uses' : '回使われた') : '') : '') + '</div></div>'
@@ -890,6 +890,9 @@ render();
 .mk{background:linear-gradient(transparent 64%, #ffc98a 64%);padding:0 3px}
 .subline{font-size:12.5px;font-weight:700;color:#8a6d3f;margin-top:7px}
 .say .ic{width:20px;height:20px;vertical-align:-4px}
+.pdrow{padding:7px 2px;border-bottom:1px solid #f3e7cd}
+.pdq{font-size:12px;font-weight:700;color:#8a6d3f}
+.pdv{font-size:15.5px;font-weight:800;margin-top:1px}
 .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:28;background:#fffdf7;border-top:2px solid #17130c;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:4px}
 .tbtn{flex:1;background:none;border:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0 3px;font-size:11px;font-weight:800;color:#8a6d3f;cursor:pointer;border-radius:12px}
 .tbtn svg{width:22px;height:22px;fill:#8a6d3f}
