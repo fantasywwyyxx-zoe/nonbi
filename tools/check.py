@@ -174,6 +174,7 @@ ok("openCommShop" in html and "openAreaRank" in html, "v87: community screen liv
 ok("shareProf" in html and "applySharedProf" in html, "v89: profile sharing live")
 ok("custom:line" in html and "privlink" in html and "screen !== 'account'" in html, "v91: LINE login, privacy link, home public until a feature is used")
 ok("featList" in html and "progHtml" in html and "goFeat" in html, "v92: feature collections + area conquest progress live")
+ok("VOTETAGS" in html and "voteTag" in html and "shop_votes" in html, "v93: preset one-line vote tags live")
 ok("shareResultsLine" in html and "shareShopLine" in html and "screen==='gate'" in html and "screen==='reg'" in html, "v90: login gate, regulars, LINE share live")
 ok("logVisit" in html and "logstrip" in html and "pushLogs" in html and "飲みログ" in html, "v82: drink log + stamps")
 ok("shop_stats" in html and "shareFavs" in html and "importShared" in html, "v83: popularity stats + shared favorites")
