@@ -562,7 +562,7 @@ function render(){ syncArea();
     var stnMode = !!s.stnPick;
     var stnQuick = (!stnMode && window.__S.stn && (window.__S.stn.home || window.__S.stn.work)) ? ((window.__S.stn.home ? '<button class="prow" onclick="gotoStation(\'home\')">' + T('家のエリア') + '：' + aname(window.__S.stn.home) + '</button>' : '') + (window.__S.stn.work ? '<button class="prow" onclick="gotoStation(\'work\')">' + T('職場のエリア') + '：' + aname(window.__S.stn.work) + '</button>' : '')) : '';
     h += '<div class="pickwrap"><div class="pick"><h3>' + (stnMode ? (s.stnPick === 'home' ? T('家のエリア') : T('職場のエリア')) : T('エリアを選ぶ')) + '</h3>'
-      + stnQuick + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ var cur = stnMode ? (window.__S.stn && window.__S.stn[s.stnPick] === k) : (AREAKEY === k); return '<button class="prow' + (cur ? ' on' : '') + '" onclick="' + (stnMode ? 'chooseStation(\'' + k + '\')' : 'pickArea(\'' + k + '\')') + '">' + aname(k) + '<span class="acnt">' + AREAS[k].length + T('軒') + '</span></button>'; }).join('')
+      + stnQuick + '<div class="agrid">' + Object.keys(AREAINFO).filter(function(k){ return AREAS[k]; }).map(function(k){ var cur = stnMode ? (window.__S.stn && window.__S.stn[s.stnPick] === k) : (AREAKEY === k); return '<button class="prow' + (cur ? ' on' : '') + '" onclick="' + '</div>' + (stnMode ? 'chooseStation(\'' + k + '\')' : 'pickArea(\'' + k + '\')') + '">' + aname(k) + '<span class="acnt">' + AREAS[k].length + T('軒') + '</span></button>'; }).join('')
       + (stnMode ? '<button class="prow" onclick="chooseStation(\'\')">' + T('設定しない') + '</button>' : '')
       + '<button class="pcancel" onclick="window.__S.stnPick=null;toggleAreas()">' + T('キャンセル') + '</button></div></div>';
   }
@@ -890,6 +890,9 @@ render();
 .mk{background:linear-gradient(transparent 64%, #ffc98a 64%);padding:0 3px}
 .subline{font-size:12.5px;font-weight:700;color:#8a6d3f;margin-top:7px}
 .say .ic{width:20px;height:20px;vertical-align:-4px}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.agrid .prow{margin-bottom:0;padding:12px 6px;font-size:16px}
+.agrid .acnt{float:none;display:block;margin-top:1px;font-size:11.5px}
 .pdrow{padding:7px 2px;border-bottom:1px solid #f3e7cd}
 .pdq{font-size:12px;font-weight:700;color:#8a6d3f}
 .pdv{font-size:15.5px;font-weight:800;margin-top:1px}

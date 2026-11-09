@@ -197,6 +197,7 @@ ok("privlink" in html and "screen !== 'account'" in html, "v91: privacy link, ho
 ok("featList" in html and "progHtml" in html and "goFeat" in html, "v92: feature collections + area conquest progress live")
 ok("VOTETAGS" in html and "voteTag" in html and "shop_votes" in html, "v93: preset one-line vote tags live")
 ok('class="ranklink" onclick' not in html, "v100: no ranking link on results")
+ok("agrid" in html, "v106: area picker two-column grid")
 ok("sz-rR" in html and "pubdetail" in html and "openPubDetail" in html and "subline" in html, "v103: A2 subpage headers + profile detail screen")
 ok("tbtn" in html and "profCode" in html and "document.fonts.load" in html and "Googleマップでお店を見る" in html and "pshare" in html and "100dvh - 24px" in html, "v102: tab bar, compact share links, poster fonts, gmap button, picker scroll")
 ok("sharePick" in html and "Threadsでシェア" in html and "threads.net/intent/post" in html and "setSharePick(true)" in html, "v101: share chooser (image/LINE/Threads)")
