@@ -207,6 +207,8 @@ ok("review" in html and "requireLogin" in html and "topacts" in html and "rateSt
 ok("pub_profiles" in html and "togglePublish" in html and "pubboard" in html, "v94: public profile board live")
 ok("shareResultsLine" in html and "shareShopLine" in html and "screen==='gate'" in html and "screen==='reg'" in html, "v90: login gate, regulars, LINE share live")
 ok('</div>pickArea' not in html and '</div>chooseStation' not in html, 'v109fix: area picker onclick not poisoned')
+ok(html.count("backbtn sm") >= 12, "v110: small back buttons on A2 pages")
+ok(html.count('style="top:118px;padding-bottom:88px"') >= 12, "v110: A2 sheets lifted")
 ok("stampgrid" in html and "stampcell" in html and "assets/stamps/" in html and "__stampCeleb" in html, "v109: area stamp wall + celebration")
 ok("ctabs" in html and "commarea" in html and "commfeat" in html and "commTabsHtml" in html, "v109: community tabs")
 ok('stnrow' not in html.split('</style>')[-1] and 'mval' in html, 'v109: station rows moved into account cards')
