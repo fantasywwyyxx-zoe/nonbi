@@ -349,13 +349,12 @@ function render(){ syncArea();
       + (fl.length ? '<button class="sharelist" onclick="shareFavs()">' + T('リストを共有する') + '</button>' : '') + (fl.length ? fl.map(function(x, pos){ return cardHtml(x.sh, x.i, pos, x.a).replace('onclick="openShop(' + x.i + ')"', 'onclick="openFavShop(\'' + x.a + '\',' + x.i + ')"'); }).join('') : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + T('まだお気に入りがないよ') + '<br>' + T('店のカードのブックマークを押すと、ここにたまるよ') + '<br><button class="more primary" style="margin-top:16px" onclick="go(\'ask\')">' + T('お店を探しに行く') + '</button></div>')
       + '</div>';
   } else if(s.screen==='pubboard'){
-    setBot('sz-rR', 'idle');
+    setBot('sz-resS', 'idle');
     var pb = __pubs || [];
     var pbRows = pb.map(function(p, ix){ return '<div class="logrow"><div class="lgmain" onclick="openPubDetail(' + ix + ')" style="cursor:pointer"><div class="lgname">' + String(p.name).replace(/</g, '&lt;') + '</div><div class="lgmeta">' + aname(p.area) + ' · ' + ansSummary(p.ans) + (p.uses ? ' · ' + p.uses + (LANG() === 'en' ? ' uses' : '回使われた') : '') + '</div></div><button class="pubbtn" onclick="savePubProfile(' + ix + ')">' + T('保存') + '</button><button class="pubbtn pri" onclick="usePubProfile(' + ix + ')">' + T('使う') + '</button></div>'; }).join('');
-    h = '<button class="backbtn sm" onclick="go(\'comm\')">' + T('← もどる') + '</button>'
-      + '<div class="backzone" onclick="go(\'comm\')"></div>'
-      + '<div class="say" style="top:60px;left:104px;right:96px;text-align:left;font-size:22px;line-height:1.35"><span class="mk">' + T('みんなのプロファイル') + '</span><div class="subline">' + T('みんなが公開した条件を見てみよう') + '</div></div>'
-      + '<div class="sheet" style="top:118px;padding-bottom:88px"><div class="grip"></div>'
+    h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><button class="backbtn" style="top:10px;left:10px" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
+      + '<div style="margin-top:64px;font-weight:800;font-size:20px;color:#111">' + T('みんなのプロファイル') + '</div>'
+      + '<div style="font-size:12.5px;color:#8a6d3f;font-weight:700;margin-bottom:4px">' + T('みんなが公開した条件を見てみよう') + '</div>'
       + commTabsHtml('pubboard')
       + (pb.length ? pbRows : '<div style="text-align:center;color:#8a6d3f;font-weight:700;padding:26px 6px;line-height:1.8">' + (__pubs === null ? T('読み込み中…') : T('まだ公開プロファイルがないよ') + '<br>' + T('自分のプロファイルを公開すると、ここに載るよ')) + '</div>')
       + '</div>';
@@ -448,7 +447,7 @@ function render(){ syncArea();
       + '</div>';
   } else if(s.screen==='commarea'){
     setBot('sz-resS', 'idle');
-    var areaHtml2 = Object.keys(AREAINFO).map(function(k){ return '<div class=\"logrow rkrow\" onclick=\"openAreaRank(\'' + k + '\')\"><div class=\"lgmain\"><div class=\"lgname\">' + aname(k) + '</div><div class=\"lgmeta\">' + AREAS[k].length + T('軒') + '</div></div><span class=\"chev\">›</span></div>'; }).join('');
+    var areaHtml2 = '<div class=\"agrid\">' + Object.keys(AREAINFO).map(function(k){ return '<button class=\"prow\" onclick=\"openAreaRank(\'' + k + '\')\">' + aname(k) + '<span class=\"acnt\">' + AREAS[k].length + T('軒') + '</span></button>'; }).join('') + '</div>';
     h = '<div class="sheet" style="top:0;height:100%;max-height:100%;border-radius:0;border-top:none;animation:sheetUp .38s cubic-bezier(.2,.8,.3,1) both"><button class="backbtn" style="top:10px;left:10px" onclick="go(\'idle\')">' + T('← もどる') + '</button>'
       + '<div style="margin-top:64px;font-weight:800;font-size:20px;color:#111">' + T('コミュニティ') + '</div>'
       + '<div style="font-size:12.5px;color:#8a6d3f;font-weight:700;margin-bottom:4px">' + T('みんなのお気に入りと「行った！」を匿名で集計') + '</div>'
