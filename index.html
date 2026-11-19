@@ -292,7 +292,9 @@ function render(){ syncArea();
       + '';
   } else if(s.screen==='gate'){
     setBot('sz-rR', 'idle');
-    h = '<div class="say" style="top:60px;left:16px;right:96px;text-align:left;padding:0 2px;font-size:' + FS(T('ログインしてはじめよう'), 1) + 'px;line-height:1.35"><span class="mk t1">' + T('ログインしてはじめよう') + '</span><div class="subline">' + T('ログインすると、保存や同期ができるよ') + '</div></div>'
+    h = '<button class="backbtn sm" onclick="gateBack()">' + T('← もどる') + '</button>'
+      + '<div class="backzone" onclick="gateBack()"></div>'
+      + '<div class="say" style="top:60px;left:104px;right:96px;text-align:left;padding:0 2px;font-size:' + FS(T('ログインしてはじめよう')) + 'px;line-height:1.35"><span class="mk t1">' + T('ログインしてはじめよう') + '</span><div class="subline">' + T('ログインすると、保存や同期ができるよ') + '</div></div>'
       + '<div class="sheet" style="top:118px;padding-bottom:88px"><div class="grip"></div>'
       + '<div class="acctcard"><div class="acctlead">' + T('ログインすると、お気に入り・プロファイル・よく使うエリアが、端末を変えてもそのまま使えるようになるよ。') + '</div>'
       + '<button class="lnbtn" onclick="doLine()">' + T('LINEでログイン') + '</button>'
@@ -336,7 +338,7 @@ function render(){ syncArea();
   } else if(s.screen==='map'){
     h = '<div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#fff9ef">'
       + '<div style="flex:none;padding:12px 12px 9px">'
-      + '<div style="display:flex;align-items:center;gap:10px"><button class="backbtn" style="position:static;flex:none" onclick="go(\'idle\')">' + T('← もどる') + '</button><div style="font-weight:900;font-size:18px">' + T('厳選マップ') + '</div><div style="font-size:12px;color:#96793f;font-weight:700">' + SHOPS.filter(function(x){ return x.ll; }).length + T('軒') + '</div></div>'
+      + '<div style="display:flex;align-items:center;gap:10px"><button class="backbtn" style="position:static;flex:none" onclick="mapBack()">' + T('← もどる') + '</button><div style="font-weight:900;font-size:18px">' + T('厳選マップ') + '</div><div style="font-size:12px;color:#96793f;font-weight:700">' + SHOPS.filter(function(x){ return x.ll; }).length + T('軒') + '</div></div>'
       + '<div style="margin-top:8px"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button></div></div>'
       + '<div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column"><div id="gmap" style="flex:1;min-height:0;position:relative;background:#e9e2d2"></div><button onclick="locateOnMap()" style="position:absolute;right:12px;bottom:14px;z-index:5;background:#fff;color:#17130c;border:2px solid #17130c;border-radius:999px;padding:9px 15px;font-weight:900;font-size:14px;box-shadow:0 3px 10px rgba(0,0,0,.25)">' + T('◎ 現在地') + '</button></div>'
       + '<div id="mapcard"></div></div>';
@@ -666,6 +668,7 @@ function pullCloud(){ if(!__sb || !__user) return; __sb.from('user_data').select
   pushCloud();
   window.hatchWidget.setState(S); render();
 }); }
+function gateBack(){ var S = window.__S; var t = S.pendingScr; S.pendingScr = null; S.screen = (t === 'detail' || t === 'pshare' || t === 'shared' || t === 'account' || t === 'idle') ? t : 'idle'; save(); render(); }
 function requireLogin(){ if(__user) return false; var S = window.__S; S.pendingScr = S.screen; S.screen = 'gate'; save(); render(); return true; }
 function setUser(u){ if(!u){ __user = null; return; } if(__user && __user.id === u.id) return; __user = {id: u.id, email: u.email || ''}; pullCloud(); var __sc = window.__S; if(__sc.screen === 'gate'){ __sc.screen = __sc.pendingScr || 'idle'; __sc.pendingScr = null; save(); } render(); }
 function authInit(){ if(!__sb) return; __sb.auth.getSession().then(function(r){ __authDone = true; if(r && r.data && r.data.session) setUser(r.data.session.user); else render(); });
@@ -775,7 +778,8 @@ function botHop(){
   w.classList.remove('hop'); void w.offsetWidth; w.classList.add('hop');
   setTimeout(function(){ w.classList.remove('hop'); }, 480);
 }
-function go(sc){ sndTap(); botHop(); window.__S.screen = sc; if(sc==='ask'){window.__S.step=0; window.__S.ans={};} if(sc==='results' && !window.__S.order.length){window.__S.screen='idle';} save(); render(); }
+function mapBack(){ go(window.__S.mapFrom || 'idle'); }
+function go(sc){ sndTap(); botHop(); if(sc==='map' && window.__S.screen !== 'map'){ window.__S.mapFrom = window.__S.screen; } window.__S.screen = sc; if(sc==='ask'){window.__S.step=0; window.__S.ans={};} if(sc==='results' && !window.__S.order.length){window.__S.screen='idle';} save(); render(); }
 function answer(k, v){
   sndTap(); botHop();
   window.__S.ans[k] = v;

@@ -231,5 +231,7 @@ ok(all(os.path.exists(ROOT + "/assets/stamps/" + k + ".webp") and os.path.exists
 ok("Object.keys(AREAINFO).length" in html, "v114: stamp wall count is dynamic")
 ok("function FS(" in html and "mk t1" in html, "v114: A2 title single-line fit wired")
 ok("__nfs" in html and "parseInt(ctx.font)" not in html, "v114: poster name shrink loop terminates")
+ok('function gateBack()' in html and html.count('gateBack()') >= 3, 'v115: gate screen has backbtn + backzone wired to gateBack')
+ok('function mapBack()' in html and 'mapFrom' in html, 'v115: map back returns to origin screen')
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
