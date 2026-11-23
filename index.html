@@ -57,6 +57,8 @@ if(!window.hatchWidget){
 #ph img{-webkit-user-drag:none}
 .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:22px 22px 0 0;border-top:2.2px solid #17130c;padding:12px 14px 16px;color:#111;z-index:6;max-height:92%;overflow-y:auto;animation:up .45s cubic-bezier(.3,0,.2,1)}
 .grip{width:40px;height:4.5px;border-radius:99px;background:#ddd;margin:0 auto 10px}
+#resdrag{touch-action:none;cursor:grab}
+.gripzone{padding:8px 0 2px;margin:-8px 0 -2px}
 .card{border:2px solid #111;border-radius:15px;overflow:hidden;margin-bottom:10px;cursor:pointer;background:#fff}
 .card img{width:100%;height:112px;object-fit:cover;display:block}
 .dthumbs{display:flex;gap:6px;margin-top:6px}.dthumbs img{flex:1;min-width:0;height:54px;object-fit:cover;border-radius:10px}
@@ -219,6 +221,14 @@ function shopLL(sh){ return sh.ll ? {lat: sh.ll[0], lng: sh.ll[1]} : null; }
 function basePos(){ return ME || null; }
 function fmtDist(m){ if(m === null) return ''; if(m < 1000) return T('約') + (Math.round(m / 10) * 10) + 'm'; return T('約') + (m / 1000).toFixed(1) + 'km'; }
 function orderNear(){ var bp = basePos(); return window.__S.order.slice().sort(function(x, y){ var da = havM(bp, shopLL(SHOPS[x])), db = havM(bp, shopLL(SHOPS[y])); if(da === null && db === null) return 0; if(da === null) return 1; if(db === null) return -1; return da - db; }); }
+function setResFull(f){ var S = window.__S; S.resFull = !!f; save(); var rb = document.getElementById('resback'); if(rb) rb.style.display = f ? 'none' : ''; var sh = document.getElementById('ressheet'); if(!sh) return; sh.style.transition = 'top .32s cubic-bezier(.2,.8,.3,1)'; if(f){ sh.style.top = '0px'; sh.style.height = '100%'; sh.style.maxHeight = '100%'; sh.style.borderRadius = '0px'; sh.style.borderTop = 'none'; } else { sh.style.top = '150px'; sh.style.height = ''; sh.style.maxHeight = ''; sh.style.borderRadius = ''; sh.style.borderTop = ''; } }
+function resSheetInit(){ var sh = document.getElementById('ressheet'); var hd = document.getElementById('resdrag'); if(!sh || !hd || hd.__wired) return; hd.__wired = 1; var pid = null, y0 = 0, top0 = 150, dy = 0, moved = false, downGrip = false;
+  hd.addEventListener('pointerdown', function(e){ if(pid !== null) return; pid = e.pointerId; y0 = e.clientY; top0 = sh.getBoundingClientRect().top; dy = 0; moved = false; downGrip = !!(e.target && e.target.closest && e.target.closest('.gripzone')); try{ hd.setPointerCapture(pid); }catch(_){ } });
+  hd.addEventListener('pointermove', function(e){ if(pid === null || e.pointerId !== pid) return; dy = e.clientY - y0; if(!moved && Math.abs(dy) > 8) moved = true; if(moved){ sh.style.transition = 'none'; var t = Math.max(0, Math.min(150, top0 + dy)); sh.style.top = t + 'px'; sh.style.height = '100%'; sh.style.maxHeight = '100%'; var f = t < 75; sh.style.borderRadius = f ? '0px' : ''; sh.style.borderTop = f ? 'none' : ''; } });
+  function resEnd(e){ if(pid === null || e.pointerId !== pid) return; pid = null; if(!moved) return; window.__resSup = true; setTimeout(function(){ window.__resSup = false; }, 120); var top = sh.getBoundingClientRect().top; var full; if(top0 > 75) full = (dy <= -60) || (top < 75); else full = !((dy >= 60) || (top >= 75)); setResFull(full); }
+  hd.addEventListener('pointerup', resEnd); hd.addEventListener('pointercancel', resEnd);
+  hd.addEventListener('click', function(e){ if(window.__resSup){ e.preventDefault(); e.stopPropagation(); window.__resSup = false; return; } if(downGrip){ downGrip = false; setResFull(!window.__S.resFull); } }, true);
+}
 function setSort(m){ var S = window.__S; S.sortMode = m; if(m === 'near' && !ME && navigator.geolocation){ navigator.geolocation.getCurrentPosition(function(p){ ME = {lat: p.coords.latitude, lng: p.coords.longitude}; if(window.__S.sortMode === 'near') render(); }, function(){}, {timeout: 6000, maximumAge: 600000}); } save(); render(); }
 var DEF = {screen:'idle', step:0, ans:{}, shop:null, pick:false, sharePick:false, order:[], shown:3, area:'ike', locTried:false, sortMode:'rec', showAreas:false, favs:[], profs:[], stn:{home:'', work:''}, ret:'results', profSave:false, stnPick:null, logs: [], shared: [], logDel: []};
 function mapUrl(kind, q){
@@ -280,7 +290,7 @@ function fitAsk(){
   if(ww > 92){ w.style.width = '92px'; return; }
 }
 function render(){ syncArea();
-  var __s0 = window.__S; if(!__s0.favs) __s0.favs = []; if(!__s0.profs) __s0.profs = []; if(!__s0.stn) __s0.stn = {home:'', work:''}; if(__s0.ret === undefined) __s0.ret = 'results'; if(__s0.profSave === undefined) __s0.profSave = false; if(__s0.stnPick === undefined) __s0.stnPick = null; if(__s0.stampView === undefined) __s0.stampView = null; if(!__s0.logs) __s0.logs = []; if(!__s0.logDel) __s0.logDel = []; if(!__s0.shared) __s0.shared = []; if(!__s0.votes) __s0.votes = {}; __s0.logs.forEach(function(e){ if(e.n === undefined && e.i !== undefined){ var a0 = AREAS[e.a]; if(a0 && a0[e.i]) e.n = a0[e.i].n; delete e.i; } });
+  var __s0 = window.__S; if(!__s0.favs) __s0.favs = []; if(!__s0.profs) __s0.profs = []; if(!__s0.stn) __s0.stn = {home:'', work:''}; if(__s0.ret === undefined) __s0.ret = 'results'; if(__s0.profSave === undefined) __s0.profSave = false; if(__s0.stnPick === undefined) __s0.stnPick = null; if(__s0.stampView === undefined) __s0.stampView = null; if(__s0.resFull === undefined) __s0.resFull = false; if(!__s0.logs) __s0.logs = []; if(!__s0.logDel) __s0.logDel = []; if(!__s0.shared) __s0.shared = []; if(!__s0.votes) __s0.votes = {}; __s0.logs.forEach(function(e){ if(e.n === undefined && e.i !== undefined){ var a0 = AREAS[e.a]; if(a0 && a0[e.i]) e.n = a0[e.i].n; delete e.i; } });
   var s = window.__S, ui = document.getElementById('ui'), h = '';
   if(__authDone && !__user && s.screen !== 'gate' && s.screen !== 'idle' && s.screen !== 'account' && s.screen !== 'detail' && s.screen !== 'pshare' && s.screen !== 'shared'){ s.pendingScr = s.screen; s.screen = 'gate'; }
   if(__authDone && __user && s.screen === 'gate'){ s.screen = s.pendingScr || 'idle'; s.pendingScr = null; }
@@ -322,13 +332,13 @@ function render(){ syncArea();
       + '<div class="say" style="bottom:112px;font-size:15px;color:#7a5f2e">' + (LANG() === 'en' ? 'Searching ' + SHOPS.length + ' spots in ' + areaName() + '…' : areaName() + 'の' + SHOPS.length + '軒から探してるよ') + '</div>';
   } else if(s.screen==='results'){
     setBot('sz-resS', 'idle');
-    if(window.__prevScr === 'think') setTimeout(function(){ var w = document.getElementById('botwrap'); if(w){ var wr = w.getBoundingClientRect(); spawnBurst(wr.left + wr.width/2, wr.top + wr.height*0.3, 9); } }, 350);
+    if(window.__prevScr === 'think'){ s.resFull = false; setTimeout(function(){ var w = document.getElementById('botwrap'); if(w){ var wr = w.getBoundingClientRect(); spawnBurst(wr.left + wr.width/2, wr.top + wr.height*0.3, 9); } }, 350); }
     var near = s.sortMode === 'near';
     var list = (near ? orderNear() : s.order).slice(0, s.shown);
-    h = '<button class="backbtn" onclick="backToLastQ()">' + T('← もどる') + '</button>'
+    h = '<button class="backbtn" id="resback"' + (s.resFull ? ' style="display:none"' : '') + ' onclick="backToLastQ()">' + T('← もどる') + '</button>'
       + '<div class="say" style="top:88px;left:88px;right:10px;text-align:left;font-size:16.5px">' + T('まずこの3軒、どう？') + '</div>'
-      + '<div class="sheet" style="top:150px"><div class="grip"></div>'
-      + '<div class="sortrow"><button class="sortbtn' + (near ? '' : ' on') + '" onclick="setSort(\'rec\')">' + T('おすすめ順') + '</button><button class="sortbtn' + (near ? ' on' : '') + '" onclick="setSort(\'near\')">' + T('近い順') + '</button></div>'
+      + '<div class="sheet" id="ressheet" style="' + (s.resFull ? 'top:0;height:100%;max-height:100%;border-radius:0;border-top:none' : 'top:150px') + '"><div id="resdrag"><div class="gripzone"><div class="grip"></div></div>'
+      + '<div class="sortrow"><button class="sortbtn' + (near ? '' : ' on') + '" onclick="setSort(\'rec\')">' + T('おすすめ順') + '</button><button class="sortbtn' + (near ? ' on' : '') + '" onclick="setSort(\'near\')">' + T('近い順') + '</button></div></div>'
       + '<div class="topacts">'
       + (s.profSave ? '<div class="profsave"><input id="profname" maxlength="20" placeholder="' + T('プロファイル名（例：デート）') + '"><button class="pbtn2" onclick="saveProfile()">' + T('保存する') + '</button></div>' : '<button class="saveprof" onclick="openProfSave()">' + SVG_LIST + ' ' + T('この条件をプロファイルに保存') + '</button>')
       + '<div class="resfoot-row"><button class="back" onclick="go(\'idle\')">' + T('← 最初から') + '</button><button class="back" onclick="editAns()">' + T('条件を変える') + '</button><button class="back" onclick="shareResultsLine()"><span class="sdot" style="background:#06c755"></span>' + T('LINEで送る') + '</button></div></div>'
@@ -595,6 +605,7 @@ function render(){ syncArea();
   var bl = document.getElementById('botlayer'); if(bl) bl.style.display = (s.screen==='map') ? 'none' : 'block';
   var gb = document.getElementById('gmapbtn'); if(gb) gb.style.display = (s.screen==='results') ? 'flex' : 'none';
   if(s.screen==='map'){ initGMap(); }
+  if(s.screen==='results'){ resSheetInit(); }
   if(s.screen==='detail'){ prepPoster(); }
   if(s.screen==='idle'){ var hs=document.getElementById('homesay'); if(hs){ var H=ph.clientHeight||640; var bw=(H>=880)?330:(H>=720)?300:Math.min(220,H*0.36); var bt=(H>=720)?Math.max(164,H*0.19):164; var bwCap=(H-232-bt)/1.3327; if(bwCap<bw){ bw=bwCap; var bwr=document.getElementById('botwrap'); if(bwr) bwr.style.width=bw+'px'; } hs.style.top=(bt+bw*1.3327+14)+'px'; setTimeout(function(){ var hs2=document.getElementById('homesay'); var bw3=document.getElementById('botwrap'); if(!hs2||!bw3) return; var cs3=getComputedStyle(bw3); var w3=parseFloat(cs3.width), t3=parseFloat(cs3.top); if(w3>0){ hs2.style.top=(t3+w3*1.3327+14)+'px'; } var pv2=document.getElementById('privlink'); var tb3=document.querySelector('.tabbar'); if(pv2&&tb3) pv2.style.bottom=(tb3.offsetHeight+5)+'px'; var pb2=document.querySelector('.pillbtn'); var tb2=document.querySelector('.tabbar'); if(pb2&&tb2){ var H2=ph.clientHeight||640; var sayB2=hs2.offsetTop+hs2.offsetHeight; var b202=H2-sayB2-20-pb2.offsetHeight; var minB2=tb2.offsetHeight+34; pb2.style.bottom=Math.max(minB2, Math.min(b202, minB2+56))+'px'; } }, 400); var pb=document.querySelector('.pillbtn'); var tb=document.querySelector('.tabbar'); if(pb&&tb){ var sayB=hs.offsetTop+hs.offsetHeight; var b20=H-sayB-20-pb.offsetHeight; var minB=tb.offsetHeight+34; pb.style.bottom=Math.max(minB, Math.min(b20, minB+56))+'px'; } } }
 }

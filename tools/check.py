@@ -233,5 +233,6 @@ ok("function FS(" in html and "mk t1" in html, "v114: A2 title single-line fit w
 ok("__nfs" in html and "parseInt(ctx.font)" not in html, "v114: poster name shrink loop terminates")
 ok('function gateBack()' in html and html.count('gateBack()') >= 3, 'v115: gate screen has backbtn + backzone wired to gateBack')
 ok('function mapBack()' in html and 'mapFrom' in html, 'v115: map back returns to origin screen')
+ok('function setResFull(' in html and 'function resSheetInit(' in html and 'resdrag' in html and 'resFull' in html, 'v116: results sheet swipe-up-to-full wiring present')
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
