@@ -333,7 +333,7 @@ function render(){ syncArea();
       + '<div class="sortrow2"><button class="sorttx' + (near ? '' : ' on') + '" onclick="setSort(\'rec\')">' + T('おすすめ順') + '</button><span class="smid">·</span><button class="sorttx' + (near ? ' on' : '') + '" onclick="setSort(\'near\')">' + T('近い順') + '</button></div></div>'
       + '<div class="resbody"><div id="rescards">' + list.map(function(i){ return shopRowHtml(SHOPS[i], i); }).join('') + '</div>'
       + '<div class="resbtns"><button class="btnmap" onclick="go(\'map\')">' + T('マップで見る') + '</button>' + (s.shown < Math.min(15, s.order.length) ? '<button class="more" onclick="more()">' + T('もっと見る') + '</button>' : '') + '</div>'
-      + (s.profSave ? '<div class="profsave"><input id="profname" maxlength="20" placeholder="' + T('プロファイル名（例：デート）') + '"><button class="pbtn2" onclick="saveProfile()">' + T('保存する') + '</button></div>' : '<button class="savelink" onclick="openProfSave()">' + T('この条件を保存する') + '</button>')
+      + (s.profSave ? '<div class="profsave"><input id="profname" maxlength="20" placeholder="' + T('プロファイル名（例：デート）') + '"><button class="pbtn2" onclick="saveProfile()">' + T('保存する') + '</button></div>' : '')
       + '</div></div>';
   }
   else if(s.screen==='map'){
@@ -1143,8 +1143,8 @@ render();
 .sumrow{display:flex;align-items:center;gap:10px;padding:2px 16px 0}
 .sumtx{flex:1;min-width:0;font-size:13px;font-weight:700;color:#96805a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sumedit{flex:none;display:inline-flex;align-items:center;min-height:38px;padding:0 16px;background:#fff;border:1px solid #e3d3ac;border-radius:999px;font-family:inherit;font-size:13.5px;font-weight:800;color:#ff7a00;cursor:pointer}
-.sortrow2{display:flex;align-items:center;justify-content:flex-end;padding:6px 16px 0}
-.sorttx{height:36px;padding:0 16px;background:#fff;border:1px solid #e3d3ac;font-family:inherit;font-size:13px;font-weight:700;color:#96805a;cursor:pointer}.sorttx:first-of-type{border-radius:999px 0 0 999px;border-right:none}.sorttx:last-of-type{border-radius:0 999px 999px 0}
+.sortrow2{display:flex;align-items:center;padding:6px 16px 0}
+.sorttx{flex:1;height:36px;padding:0 8px;background:#fff;border:1px solid #e3d3ac;font-family:inherit;font-size:13px;font-weight:700;color:#96805a;cursor:pointer}.sorttx:first-of-type{border-radius:999px 0 0 999px;border-right:none}.sorttx:last-of-type{border-radius:0 999px 999px 0}
 .sorttx.on{background:#17130c;color:#fff9ef;font-weight:800;border-color:#17130c}
 .smid{display:none}
 .resbody{padding:8px 16px 28px}
@@ -1161,7 +1161,6 @@ div.srimg.noimg{height:88px}
 .resbtns{display:flex;gap:10px;margin-top:2px}
 .btnmap{flex:1;background:linear-gradient(180deg,#ff9a2e,#ff6a00);color:#fff;border:none;border-radius:12px;padding:13px 0;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer}
 .resbtns .more{flex:1;margin:0;background:#fff;color:#17130c;border:1px solid #e3d3ac;border-radius:12px;padding:13px 0;font-weight:800;font-size:15px;box-shadow:none;cursor:pointer;font-family:inherit}
-.savelink{display:flex;align-items:center;justify-content:center;width:fit-content;margin:14px auto 0;background:#fff;border:1px solid #e3d3ac;border-radius:999px;min-height:38px;padding:0 22px;font-family:inherit;font-size:13px;font-weight:700;color:#7a5f2e;cursor:pointer}
 .crow{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid #eee0bd;border-radius:14px;padding:8px 10px;margin-bottom:8px;cursor:pointer}
 .crimg{width:56px;height:56px;border-radius:10px;object-fit:cover;flex:none}
 div.crimg.noimg{height:56px}
