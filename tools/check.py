@@ -238,6 +238,7 @@ ok('actbar' in html and 'dband' in html and 'dphotos' in html and 'wentbtn' in h
 ok('function dExpToggle(' in html and 'dexpbody' in html and 'dscroll' in html and 'function shortB(' in html and 'function shortH(' in html, 'v118: detail layered layout, expander and in-flow bar present')
 ok(html.count('hashTagsHtml(sh)') == 1, 'v118: hashtags no longer rendered on detail (definition only)')
 ok('ressheet' not in html and 'sumrow' in html and 'sorttx' in html, 'v119: results header = summary line + text sort')
+ok('.sumedit{flex:none;display:inline-flex' in html and '.sorttx.on{background:#17130c' in html and '.savelink{display:flex' in html, 'v120: results controls are real pill buttons (edit / sort segments / save)')
 ok('setPointerCapture' not in html, 'v118: results drag keeps header clicks alive (no pointer capture)')
 ok("マイ酒場" in html and "さがす" in html and "__tbOn = {idle:1, mine:1, account:1}" in html, "v119: tab bar is exactly search/mine/mypage on the three roots")
 ok("assets/leaflet.css" in html and "assets/MarkerCluster.css" in html and "assets/leaflet.markercluster.js" in html, "v119: leaflet assets wired in head")
