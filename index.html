@@ -238,6 +238,7 @@ function mapUrl(kind, q){
   return 'https://map.yahoo.co.jp/search?q='+e;
 }
 function scoreLine(sh, full){ var p = []; if(sh.gs) p.push('<span class="sgroup"><span class="stag">Google</span><span class="st">★</span>' + sh.gs + (full && sh.gc ? '<span class="scnt">' + (LANG() === 'en' ? ' (' + sh.gc + ' reviews)' : '（' + sh.gc + '件）') + '</span>' : '') + '</span>'); if(sh.ts) p.push('<span class="sgroup"><span class="stag">' + (LANG() === 'en' ? 'Tabelog' : '食べログ') + '</span><span class="st">★</span>' + sh.ts + (full && sh.tc ? '<span class="scnt">' + (LANG() === 'en' ? ' (' + sh.tc + ' reviews)' : '（' + sh.tc + '件）') + '</span>' : '') + '</span>'); return p.join(''); }
+function scoreBlocks(sh){ var p = []; if(sh.gs) p.push('<div class="scblock"><div class="scsrc">Google</div><div class="scval"><span class="st">★</span>' + sh.gs + (sh.gc ? '<span class="scnt">' + (LANG() === 'en' ? ' (' + sh.gc + ')' : '（' + sh.gc + '件）') + '</span>' : '') + '</div></div>'); if(sh.ts) p.push('<div class="scblock"><div class="scsrc">' + (LANG() === 'en' ? 'Tabelog' : '食べログ') + '</div><div class="scval"><span class="st">★</span>' + sh.ts + (sh.tc ? '<span class="scnt">' + (LANG() === 'en' ? ' (' + sh.tc + ')' : '（' + sh.tc + '件）') + '</span>' : '') + '</div></div>'); if(!p.length) return ''; return '<div class="scblocks' + (p.length === 1 ? ' one' : '') + '">' + p.join('') + '</div>'; }
 function attrLine(sh){ var p = [areaName()]; var dm = havM(basePos(), shopLL(sh)); if(dm !== null) p.push(fmtDist(dm)); if((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0) p.push(T('飲み放題あり')); var sk = smokeKind(sh); if(sk) p.push(T(sk === 'ns' ? '禁煙' : (sk === 'sm' ? '喫煙可' : '分煙'))); return p.join(' · '); }
 function shopRowHtml(sh, idx){ var top = sh.img ? '<img class="srimg" src="' + PH[sh.img] + '">' : (sh.ph ? '<img class="srimg" src="' + PHB + sh.ph[0] + '">' : '<div class="srimg noimg nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4) + '"></div>'); return '<div class="srow" onclick="openShop(' + idx + ')">' + top + '<div class="srbody"><div class="srname">' + sh.n + '</div><div class="scline">' + scoreLine(sh, false) + '</div><div class="srmeta">' + dispG(sh) + (sh.b ? ' · ' + shortB(sh.b) : '') + '</div>' + (sh.w ? '<div class="srw">' + sh.w + '</div>' : '') + '</div></div>'; }
 function compactRowHtml(sh, a, oc, badge){ var th = sh.ph ? '<img class="crimg" src="' + PHB + sh.ph[0] + '">' : (sh.img ? '<img class="crimg" src="' + PH[sh.img] + '">' : '<div class="crimg noimg nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4) + '"></div>'); return '<div class="crow" onclick="' + oc + '">' + th + '<div class="crbody"><div class="crname">' + sh.n + '</div><div class="scline sm">' + scoreLine(sh, false) + '</div></div>' + (badge ? '<span class="crbadge">' + badge + '</span>' : '') + '<span class="chev">›</span></div>'; }
@@ -392,7 +393,7 @@ function render(){ syncArea();
     h = '<div class="page dpage"><div class="phd">' + bkHtml('go(window.__S.ret||\'results\')') + '</div>'
       + '<div class="dbody">' + top2
       + '<div class="dname">' + sh.n + '</div>' + (sh.g ? '<div class="dgenre2">' + dispG(sh) + '</div>' : '')
-      + '<div class="scline">' + scoreLine(sh, true) + '</div>'
+      + scoreBlocks(sh)
       + '<div class="attrrow"><div class="attrline">' + attrLine(sh) + '</div>' + wentBtnHtml() + '</div>'
       + (sh.w ? '<div class="dband"><img src="'+ANIM.idle+'"><div class="dbtx"><div>'+sh.w+'</div></div></div>' : '')
       + '<div class="kv dkv">' + (sh.b ? '<div class="krow"><b>'+T('予算')+'</b><span>'+shortB(sh.b)+'</span></div>' : '') + (sh.h ? '<div class="krow"><b>'+T('営業')+'</b><span>'+shortH(sh.h)+'</span></div>' : '') + (sh.a ? '<div class="krow"><b>'+T('住所')+'</b><span>'+sh.a+'</span></div>' : '') + (sh.s ? '<div class="krow"><b>'+T('酒')+'</b><span>'+shortS(sh.s)+'</span></div>' : '') + '</div>'
@@ -1175,6 +1176,13 @@ div.srimg.noimg{height:88px}
 .scline .scnt{color:#96805a;font-weight:400;font-size:.9em}
 .scline.sm{font-size:12px;margin-top:2px}
 .scline .sgroup{display:inline-flex;align-items:center;white-space:nowrap}
+.scblocks{display:flex;gap:10px}
+.scblock{flex:1;min-width:0;background:#fdeeda;border-radius:10px;padding:8px 12px}
+.scblocks.one .scblock{flex:0 0 calc(50% - 5px)}
+.scsrc{font-size:11px;font-weight:800;color:#8a6d3f;line-height:1.3}
+.scval{font-size:16.5px;font-weight:800;color:#17130c;line-height:1.35;white-space:nowrap;margin-top:1px}
+.scval .st{color:#ff7a00}
+.scval .scnt{color:#96805a;font-weight:400;font-size:11px;margin-left:5px}
 .srmeta{font-size:12px;color:#96805a;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .srw{font-size:12.5px;color:#5a4a2e;line-height:1.5;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .resbtns{display:flex;gap:10px;margin-top:2px}
@@ -1236,7 +1244,7 @@ div.crimg.noimg{height:56px}
 .dpage .dphotos{height:168px}
 .dpage .dname{font-size:20px;margin-top:12px;line-height:1.35}
 .dgenre2{font-size:12.5px;color:#a5762a;font-weight:800;margin-top:3px}
-.dpage .scline{font-size:13.5px;margin-top:8px}
+.dpage .scblocks{margin-top:10px}
 .attrrow{display:flex;align-items:center;gap:10px;margin-top:5px}
 .attrline{font-size:12.5px;color:#96805a;font-weight:700}
 .attrrow .attrline{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
