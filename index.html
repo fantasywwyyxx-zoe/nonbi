@@ -233,7 +233,7 @@ function mapUrl(kind, q){
   if(kind==='apple') return 'https://maps.apple.com/?q='+e;
   return 'https://map.yahoo.co.jp/search?q='+e;
 }
-function scoreLine(sh, full){ var p = []; if(sh.gs) p.push('Google <span class="st">★</span>' + sh.gs + (full && sh.gc ? (LANG() === 'en' ? ' (' + sh.gc + ' reviews)' : '（' + sh.gc + '件）') : '')); if(sh.ts) p.push((LANG() === 'en' ? 'Tabelog ' : '食べログ ') + sh.ts + (full && sh.tc ? (LANG() === 'en' ? ' (' + sh.tc + ' reviews)' : '（' + sh.tc + '件）') : '')); return p.join(' · '); }
+function scoreLine(sh, full){ var p = []; if(sh.gs) p.push('<span class="stag">Google</span><span class="st">★</span>' + sh.gs + (full && sh.gc ? '<span class="scnt">' + (LANG() === 'en' ? ' (' + sh.gc + ' reviews)' : '（' + sh.gc + '件）') + '</span>' : '')); if(sh.ts) p.push('<span class="stag">' + (LANG() === 'en' ? 'Tabelog' : '食べログ') + '</span><span class="st">★</span>' + sh.ts + (full && sh.tc ? '<span class="scnt">' + (LANG() === 'en' ? ' (' + sh.tc + ' reviews)' : '（' + sh.tc + '件）') + '</span>' : '')); return p.join(' · '); }
 function attrLine(sh){ var p = [areaName()]; var dm = havM(basePos(), shopLL(sh)); if(dm !== null) p.push(fmtDist(dm)); if((sh.g + sh.w + sh.s + sh.tags.join('')).indexOf('飲み放題') >= 0) p.push(T('飲み放題あり')); var sk = smokeKind(sh); if(sk) p.push(T(sk === 'ns' ? '禁煙' : (sk === 'sm' ? '喫煙可' : '分煙'))); return p.join(' · '); }
 function shopRowHtml(sh, idx){ var top = sh.img ? '<img class="srimg" src="' + PH[sh.img] + '">' : (sh.ph ? '<img class="srimg" src="' + PHB + sh.ph[0] + '">' : '<div class="srimg noimg nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4) + '"></div>'); return '<div class="srow" onclick="openShop(' + idx + ')">' + top + '<div class="srbody"><div class="srname">' + sh.n + '</div><div class="scline">' + scoreLine(sh, false) + '</div><div class="srmeta">' + dispG(sh) + (sh.b ? ' · ' + shortB(sh.b) : '') + '</div>' + (sh.w ? '<div class="srw">' + sh.w + '</div>' : '') + '</div></div>'; }
 function compactRowHtml(sh, a, oc, badge){ var th = sh.ph ? '<img class="crimg" src="' + PHB + sh.ph[0] + '">' : (sh.img ? '<img class="crimg" src="' + PH[sh.img] + '">' : '<div class="crimg noimg nz' + ((sh.n.charCodeAt(0) + sh.n.length) % 4) + '"></div>'); return '<div class="crow" onclick="' + oc + '">' + th + '<div class="crbody"><div class="crname">' + sh.n + '</div><div class="scline sm">' + scoreLine(sh, false) + '</div></div>' + (badge ? '<span class="crbadge">' + badge + '</span>' : '') + '<span class="chev">›</span></div>'; }
@@ -252,7 +252,7 @@ function loginCardHtml(){
     : '<div class="emrow"><input id="emaddr" type="email" inputmode="email" placeholder="' + T('メールアドレス') + '"><button class="embtn" onclick="doEmail()">' + T('コードを送る') + '</button></div>')
   + '</div>';
 }
-function wentBtnHtml(){ var s = window.__S; var sh = SHOPS[s.shop]; if(!sh) return ''; var nm = sh.n; var n = logCount(AREAKEY, nm); var td = (s.logs || []).some(function(e){ return e.a === AREAKEY && e.n === nm && e.d === todayStr(); }); if(td) return '<button class="wentbtn done" onclick="undoToday(event)">✓ ' + T('行った！') + (n > 1 ? ' ×' + n : '') + '</button>'; return '<button class="wentbtn" onclick="logVisit(event)">' + T('行った！（飲みログに記録）') + (n ? ' ×' + n : '') + '</button>'; }
+function wentBtnHtml(){ var s = window.__S; var sh = SHOPS[s.shop]; if(!sh) return ''; var nm = sh.n; var n = logCount(AREAKEY, nm); var td = (s.logs || []).some(function(e){ return e.a === AREAKEY && e.n === nm && e.d === todayStr(); }); if(td) return '<button class="wentbtn done" onclick="undoToday(event)">✓ ' + T('行った！') + (n > 1 ? ' ×' + n : '') + '</button>'; return '<button class="wentbtn" onclick="logVisit(event)">' + T('行った！') + (n ? ' ×' + n : '') + '</button>'; }
 function logSheetHtml(){ var s = window.__S; var sh = SHOPS[s.shop]; if(!sh) return ''; var cel = window.__stampCeleb; var c = stampCount(AREAKEY); return '<div class="logsheetwrap" onclick="closeLogSheet()"><div class="logsheet" onclick="event.stopPropagation()"><div class="lsheetgrip"></div><div class="lsheettitle">' + T('記録したよ！スタンプ +1') + '</div><div class="lsheetshop">' + sh.n + '</div>' + (cel ? '<div class="lstampbox"><img src="' + stampImg(AREAKEY, c) + '"><div>' + aname(AREAKEY) + ' ' + (c >= 5 ? '★ ' + T('金色') : c + '/5') + (cel.gold ? '<br>' + T('金色に進化！') : '<br>' + T('スタンプをゲット！')) + '</div></div>' : '') + voteHtml(AREAKEY, sh) + '<button class="more primary" style="margin-top:14px" onclick="closeLogSheet()">' + T('閉じる') + '</button></div></div>'; }
 function closeLogSheet(){ window.__S.logSheet = false; window.__stampCeleb = null; save(); render(); }
 /* ---- persistent robot layer: never re-created, only resized + crossfaded ---- */
@@ -1125,7 +1125,7 @@ render();
 .dnamerow{align-items:flex-start}
 .darea{margin-top:4px}
 .dscores .sc{font-size:13px;padding:7px 11px}
-.dbtx{font-size:15px}
+.dbtx{font-size:13.5px;line-height:1.5}
 .dkv{font-size:15px;line-height:1.55}
 .dexp{margin-top:2px}
 .dexphead{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;border-top:1px solid #f1e5cd;border-bottom:1px solid #f1e5cd;padding:11px 2px;font-family:inherit;font-size:13px;font-weight:700;color:#96805a;cursor:pointer}
@@ -1155,6 +1155,8 @@ div.srimg.noimg{height:88px}
 .srname{font-weight:800;font-size:15.5px;color:#17130c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .scline{font-size:13px;font-weight:700;color:#17130c;margin-top:3px}
 .scline .st{color:#ff7a00}
+.scline .stag{display:inline-block;background:#f3e9d2;color:#17130c;font-size:11px;font-weight:800;border-radius:4px;padding:1px 5px;margin-right:4px;vertical-align:1px}
+.scline .scnt{color:#96805a;font-weight:400;font-size:.9em}
 .scline.sm{font-size:12px;margin-top:2px}
 .srmeta{font-size:12px;color:#96805a;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .srw{font-size:12.5px;color:#5a4a2e;line-height:1.5;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -1220,7 +1222,7 @@ div.crimg.noimg{height:56px}
 .dpage .scline{font-size:13.5px;margin-top:8px}
 .attrline{font-size:12.5px;color:#96805a;font-weight:700;margin-top:5px}
 .dpage .dband{margin-top:12px}
-.wentbtn{display:block;width:100%;margin-top:12px;padding:13px 0;border-radius:12px;border:1.8px solid #ff7a00;background:#fff;color:#ff7a00;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.wentbtn{display:block;width:fit-content;height:43px;margin:12px auto 0;padding:0 22px;border-radius:999px;border:1.8px solid #ff7a00;background:#fff;color:#ff7a00;font-family:inherit;font-weight:800;font-size:14.5px;cursor:pointer}
 .wentbtn.done{background:#fff6e8;color:#b35c00;border-color:#e3d3ac}
 .dpage .dkv{margin-top:6px}
 .dpage .krow b{flex-basis:52px}
