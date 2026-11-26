@@ -249,5 +249,12 @@ ok("qtext2" in html and "タップで次の質問へ" in html and "qprog" in htm
 ok('stag' in html and 'scnt' in html and 'sgroup' in html and '.scline{display:flex' in html and 'attrrow' in html and '.wentbtn{display:inline-flex' in html and '.dbtx{font-size:13.5px' in html, 'v124: score groups separated with air, went pill moved into the attr row')
 ok('function locSheetHtml(' in html and '現在地を使いますか？' in html and 'function locSheetUse(' in html and 'function locSheetStay(' in html and 'おすすめ順で表示しています' in html and 'locSheet:false' in html, 'v123: near sort opens a location-consent sheet; denial keeps recommended order with a notice, never silent')
 ok('favbtn' in html and '保存済み' in html and 'lsheetnote' in html and '行った店に保存されます' in html and 'hometrust' in html and 'ログインなしで使えます' in html and 'エリア・予算・人数・好みから' in html and 'No account needed' in html, 'v124: labelled save button, log sheet sync note, home concrete copy plus trust line')
+_ev125 = set()
+for _seg125 in html.split('track(' + chr(39))[1:]:
+    _ev125.add(_seg125.split(chr(39))[0])
+ok(_ev125 == {'home_view', 'quiz_start', 'quiz_step', 'first_results_shown', 'sort_click', 'card_click', 'detail_view', 'call_click', 'map_click', 'fav_add', 'log_add', 'login_prompt_shown', 'login_complete', 'lang_switch'}, 'v125: tracker wires exactly the approved 14 events')
+_bad125 = [1 for _seg125 in html.split('track(' + chr(39))[1:] if ('lat' in _seg125.split('}', 1)[0] or 'lng' in _seg125.split('}', 1)[0])]
+ok(not _bad125, 'v125: no tracker prop carries location keys')
+ok('/rest/v1/events' in html and 'nb_sid' in html and 'pagehide' in html and 'function track(' in html, 'v125: anonymous tracker posts to the events endpoint with a session id')
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)

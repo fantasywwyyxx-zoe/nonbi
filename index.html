@@ -122,7 +122,7 @@ var ME = null;
 var SHOPS = AREAS.ike;
 function LANG(){ return (window.__S && window.__S.lang) || 'ja'; }
 function T(s){ return (LANG() === 'en' && EN[s]) || s; }
-function setLang(l){ __langMenu = false; window.__S.lang = l; save(); render(); }
+function setLang(l){ track('lang_switch', {to: l}); __langMenu = false; window.__S.lang = l; save(); render(); }
 function areaName(){ return LANG() === 'en' ? AREAINFO[AREAKEY].nameE : AREAINFO[AREAKEY].name; }
 function aname(k){ return LANG() === 'en' ? AREAINFO[k].nameE : AREAINFO[k].name; }
 function FS(t, w, x){ var u = x || 0; t = String(t == null ? '' : t); for(var i = 0; i < t.length; i++){ var c = t.charCodeAt(i); u += (c >= 0x1100) ? 1 : 0.55; } var s = Math.floor((w ? 300 : 180) / (u * 1.09)); return s > 22 ? 22 : (s < 11 ? 11 : s); }
@@ -301,9 +301,10 @@ function render(){ syncArea();
   var __norm = {fav: 'mine', reg: 'mine', log: 'mine', prof: 'mine', shared: 'mine', comm: 'idle', commarea: 'idle', commfeat: 'idle', pubboard: 'idle', pubdetail: 'idle', rank: 'idle', feat: 'idle'};
   if(__norm[s.screen]) s.screen = __norm[s.screen];
   if(s.screen === 'review') s.screen = (s.shop !== null && s.shop !== undefined) ? 'detail' : 'idle';
-  if(s.screen === 'pshare'){ if(s.sharedProf){ var __sp = s.sharedProf; s.area = __sp.a; syncArea(); s.ans = JSON.parse(JSON.stringify(__sp.ans)); s.sharedProf = null; s.screen = 'think'; setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.ret = 'results'; save(); render(); }, 1700); } else s.screen = 'idle'; }
-  if(__authDone && !__user && s.screen !== 'gate' && s.screen !== 'idle' && s.screen !== 'ask' && s.screen !== 'think' && s.screen !== 'results' && s.screen !== 'detail' && s.screen !== 'map' && s.screen !== 'account'){ s.pendingScr = s.screen; s.screen = 'gate'; }
+  if(s.screen === 'pshare'){ if(s.sharedProf){ var __sp = s.sharedProf; s.area = __sp.a; syncArea(); s.ans = JSON.parse(JSON.stringify(__sp.ans)); s.sharedProf = null; s.screen = 'think'; setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.ret = 'results'; __frs(); save(); render(); }, 1700); } else s.screen = 'idle'; }
+  if(__authDone && !__user && s.screen !== 'gate' && s.screen !== 'idle' && s.screen !== 'ask' && s.screen !== 'think' && s.screen !== 'results' && s.screen !== 'detail' && s.screen !== 'map' && s.screen !== 'account'){ track('login_prompt_shown', {source: s.screen}); s.pendingScr = s.screen; s.screen = 'gate'; }
   if(__authDone && __user && s.screen === 'gate'){ s.screen = s.pendingScr || 'idle'; s.pendingScr = null; }
+  if(window.__trkScr !== s.screen){ window.__trkScr = s.screen; if(s.screen === 'idle') track('home_view', {}); }
   if(s.screen==='idle'){
     setBot('sz-idle', 'idle');
     h = '<img class="brandlogo" src="assets/logo.png?v=43" alt="のんびー"><div class="areaDrop"><div class="areapill"><button class="adbtn" onclick="toggleAreas()">'+SVG_PIN+'' + areaName() + '<span class="adcaret">▾</span></button></div></div>'
@@ -476,7 +477,7 @@ function stampImg(k, c){ return 'assets/stamps/' + k + (c >= 5 ? '-gold' : '') +
 function openStamp(k){ sndTap(); window.__S.stampView = k; save(); render(); }
 function closeStamp(){ window.__S.stampView = null; window.__stampCeleb = null; save(); render(); }
 function stampOverlayHtml(k){ var c = stampCount(k); var celeb = window.__stampCeleb && window.__stampCeleb.k === k; var names = []; var seen = {}; (window.__S.logs || []).forEach(function(e){ if(e.a === k && !seen[e.n]){ seen[e.n] = 1; names.push(e.n); } }); return '<div class="stampov" onclick="closeStamp()"><div class="stampcard" onclick="event.stopPropagation()">' + (celeb ? '<div style="font-weight:800;font-size:19px;margin-bottom:2px">' + T(window.__stampCeleb.gold ? '金色に進化！' : 'スタンプをゲット！') + '</div>' : '') + '<img class="stampbig" src="' + stampImg(k, c) + '"><div style="font-weight:800;font-size:17px">' + aname(k) + '</div><div class="stampst' + (c >= 5 ? ' gold' : '') + '" style="font-size:13px">' + (c >= 5 ? '★ ' + T('金色') : c + '/5') + '</div>' + (names.length ? '<div class="stampshops">' + names.map(function(n){ return '・' + String(n).replace(/</g, '&lt;'); }).join('<br>') + '</div>' : '<div style="color:#8a6d3f;font-weight:700;font-size:13px;margin-top:8px">' + T('まだ記録がないよ') + '</div>') + '<button class="more primary" style="margin-top:14px" onclick="closeStamp()">' + T('閉じる') + '</button></div></div>'; }
-function logVisit(ev){ var s = window.__S; if(s.shop === null || s.shop === undefined) return; if(requireLogin()) return; if(!s.logs) s.logs = []; var nm2 = SHOPS[s.shop].n; if(s.logs.some(function(e){ return e.a === AREAKEY && e.n === nm2 && e.d === todayStr(); })){ toast(T('今日はもう記録してあるよ')); return; } if(s.logDel) s.logDel = s.logDel.filter(function(k){ return k !== logKey({a: AREAKEY, n: nm2, d: todayStr(), note: ''}); }); var __sb4 = stampCount(AREAKEY); s.logs.push({a: AREAKEY, n: nm2, d: todayStr(), note: ''}); var __sa4 = stampCount(AREAKEY); if((__sb4 === 0 && __sa4 >= 1) || (__sb4 < 5 && __sa4 >= 5)){ window.__stampCeleb = {k: AREAKEY, gold: __sa4 >= 5}; } sndTap(); if(ev && ev.clientX){ spawnBurst(ev.clientX, ev.clientY, 8); } s.logSheet = true; save(); render(); }
+function logVisit(ev){ var s = window.__S; if(s.shop === null || s.shop === undefined) return; if(requireLogin()) return; if(!s.logs) s.logs = []; var nm2 = SHOPS[s.shop].n; if(s.logs.some(function(e){ return e.a === AREAKEY && e.n === nm2 && e.d === todayStr(); })){ toast(T('今日はもう記録してあるよ')); return; } if(s.logDel) s.logDel = s.logDel.filter(function(k){ return k !== logKey({a: AREAKEY, n: nm2, d: todayStr(), note: ''}); }); var __sb4 = stampCount(AREAKEY); s.logs.push({a: AREAKEY, n: nm2, d: todayStr(), note: ''}); track('log_add', {shop_key: AREAKEY + '|' + nm2}); var __sa4 = stampCount(AREAKEY); if((__sb4 === 0 && __sa4 >= 1) || (__sb4 < 5 && __sa4 >= 5)){ window.__stampCeleb = {k: AREAKEY, gold: __sa4 >= 5}; } sndTap(); if(ev && ev.clientX){ spawnBurst(ev.clientX, ev.clientY, 8); } s.logSheet = true; save(); render(); }
 function editNote(ix){ __noteEdit = ix; render(); setTimeout(function(){ var el = document.getElementById('notein'); if(el) el.focus(); }, 80); }
 function saveNote(ix){ var el = document.getElementById('notein'); var v = el ? el.value.trim().slice(0, 60) : ''; if(window.__S.logs && window.__S.logs[ix]) window.__S.logs[ix].note = v.replace(/</g, ''); __noteEdit = null; save(); render(); }
 function delLog(ix){ var S = window.__S; if(S.logs && S.logs[ix]){ S.logDel = S.logDel || []; S.logDel.push(logKey(S.logs[ix])); S.logs.splice(ix, 1); } __noteEdit = null; save(); render(); }
@@ -486,6 +487,16 @@ var SB_URL = 'https://xahcknrprgtvpxrayfot.supabase.co', SB_KEY = 'eyJhbGciOiJIU
 var __sb = null, __user = null, __syncT = null;
 var __authDone = false;
 try{ if(window.supabase && SB_URL && SB_KEY) __sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){ __sb = null; }
+/* ==== v125 anonymous analytics (P0-3): session id only; NO location, NO user id, NO free text ==== */
+var __sid = '';
+try{ __sid = sessionStorage.getItem('nb_sid') || ''; if(!__sid){ __sid = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12); sessionStorage.setItem('nb_sid', __sid); } }catch(e){ __sid = 's' + Date.now().toString(36); }
+var __evq = [];
+function track(ev, props){ try{ __evq.push({session_id: __sid, event: ev, props: props || {}, lang: LANG(), logged_in: !!__user}); if(__evq.length >= 20) __flushEv(); }catch(e){} }
+function __flushEv(){ if(!__evq.length) return; var batch = __evq.splice(0, __evq.length); try{ fetch(SB_URL + '/rest/v1/events', {method: 'POST', keepalive: true, headers: {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal'}, body: JSON.stringify(batch)}).then(function(){}, function(){}); }catch(e){} }
+try{ setInterval(__flushEv, 10000); window.addEventListener('pagehide', __flushEv); document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') __flushEv(); }); }catch(e){}
+function __frs(){ try{ track('first_results_shown', {area: AREAKEY, shown: Math.min(3, (window.__S.order || []).length)}); }catch(e){} }
+try{ document.addEventListener('click', function(e){ try{ var t = e.target; if(!t || !t.closest) return; var row = t.closest('#rescards .srow'); if(row){ var c = document.getElementById('rescards'); if(c){ var pos = Array.prototype.indexOf.call(c.children, row); var ord = (window.__S.sortMode === 'near' && typeof orderNear === 'function') ? orderNear() : (window.__S.order || []); var si = ord[pos]; if(si !== undefined && SHOPS[si]) track('card_click', {shop_key: AREAKEY + '|' + SHOPS[si].n, position: pos}); } return; } if(window.__S.shop !== null && window.__S.shop !== undefined && SHOPS[window.__S.shop]){ var sk = AREAKEY + '|' + SHOPS[window.__S.shop].n; if(t.closest('.actbar a.tel')) track('call_click', {shop_key: sk}); else if(t.closest('.actbar .map')) track('map_click', {shop_key: sk}); } }catch(e2){} }, true); }catch(e){}
+
 function USER(){ return __user; }
 function queueSync(){ if(!__sb || !__user) return; if(__syncT) clearTimeout(__syncT); __syncT = setTimeout(pushCloud, 900); }
 function pushCloud(){ if(!__sb || !__user) return; pushLogs(); var S = window.__S; __sb.from('user_data').upsert({user_id: __user.id, favs: S.favs || [], profs: S.profs || [], stn: S.stn || {home: '', work: ''}, votes: S.votes || {}, updated_at: new Date().toISOString()}).then(function(r){ if(r && r.error) console.log('sync', r.error.message); }); }
@@ -511,8 +522,8 @@ function pullCloud(){ if(!__sb || !__user) return; __sb.from('user_data').select
   window.hatchWidget.setState(S); render();
 }); }
 function gateBack(){ var S = window.__S; var t = S.pendingScr; S.pendingScr = null; S.screen = (t === 'detail' || t === 'account' || t === 'idle' || t === 'results' || t === 'ask' || t === 'map') ? t : 'idle'; save(); render(); }
-function requireLogin(){ if(__user) return false; var S = window.__S; S.pendingScr = S.screen; S.screen = 'gate'; save(); render(); return true; }
-function setUser(u){ if(!u){ __user = null; return; } if(__user && __user.id === u.id) return; __user = {id: u.id, email: u.email || ''}; pullCloud(); var __sc = window.__S; if(__sc.screen === 'gate'){ __sc.screen = __sc.pendingScr || 'idle'; __sc.pendingScr = null; save(); } render(); }
+function requireLogin(){ if(__user) return false; var S = window.__S; track('login_prompt_shown', {source: S.screen}); S.pendingScr = S.screen; S.screen = 'gate'; save(); render(); return true; }
+function setUser(u){ if(!u){ __user = null; return; } if(__user && __user.id === u.id) return; __user = {id: u.id, email: u.email || ''}; track('login_complete', {}); pullCloud(); var __sc = window.__S; if(__sc.screen === 'gate'){ __sc.screen = __sc.pendingScr || 'idle'; __sc.pendingScr = null; save(); } render(); }
 function authInit(){ if(!__sb) return; __sb.auth.getSession().then(function(r){ __authDone = true; if(r && r.data && r.data.session) setUser(r.data.session.user); else render(); });
   __sb.auth.onAuthStateChange(function(ev, sess){ if(sess && sess.user) setUser(sess.user); else if(ev === 'SIGNED_OUT'){ __user = null; render(); } }); }
 function doGoogle(){ if(!__sb){ toast(T('接続を確認してね')); return; } __sb.auth.signInWithOAuth({provider: 'google', options: {redirectTo: location.origin + location.pathname}}).then(function(r){ if(r && r.error) toast(T('接続を確認してね')); }); }
@@ -581,14 +592,15 @@ function botHop(){
   w.classList.remove('hop'); void w.offsetWidth; w.classList.add('hop');
   setTimeout(function(){ w.classList.remove('hop'); }, 480);
 }
-function goMine(){ if(!__user){ var S = window.__S; S.pendingScr = 'mine'; S.screen = 'gate'; save(); render(); return; } go('mine'); }
+function goMine(){ if(!__user){ var S = window.__S; track('login_prompt_shown', {source: 'mine'}); S.pendingScr = 'mine'; S.screen = 'gate'; save(); render(); return; } go('mine'); }
 function mapBack(){ go(window.__S.mapFrom || 'idle'); }
-function go(sc){ sndTap(); botHop(); if(sc==='map' && window.__S.screen !== 'map'){ window.__S.mapFrom = window.__S.screen; } window.__S.screen = sc; if(sc==='ask'){window.__S.step=0; window.__S.ans={};} if(sc==='results' && !window.__S.order.length){window.__S.screen='idle';} save(); render(); }
+function go(sc){ sndTap(); botHop(); if(sc==='map' && window.__S.screen !== 'map'){ window.__S.mapFrom = window.__S.screen; } window.__S.screen = sc; if(sc==='ask'){window.__S.step=0; window.__S.ans={};} if(sc==='ask'){ track('quiz_start', {}); } if(sc==='results' && !window.__S.order.length){window.__S.screen='idle';} save(); render(); }
 function answer(k, v){
   sndTap(); botHop();
+  track('quiz_step', {step: window.__S.step + 1});
   window.__S.ans[k] = v;
   if(window.__S.step < QS.length-1){ window.__S.step++; }
-  else { window.__S.screen='think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen='results'; window.__S.profSave = false; window.__S.ret = 'results'; save(); render(); }, 1700); return; }
+  else { window.__S.screen='think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen='results'; window.__S.profSave = false; __frs(); window.__S.ret = 'results'; save(); render(); }, 1700); return; }
   save(); render();
 }
 function backStep(){ sndBack(); if(window.__S.step > 0){ window.__S.step--; } else { window.__S.screen='idle'; } save(); render(); }
@@ -596,7 +608,7 @@ function editAns(){ window.__S.screen='ask'; window.__S.step=0; save(); render()
 function backToLastQ(){ sndBack(); window.__S.screen='ask'; window.__S.step = QS.length - 1; save(); render(); }
 function moreLabel(){ return LANG() === 'en' ? 'See more' : 'もっと見る'; }
 function more(){ sndTap(); var s = window.__S; var total = Math.min(15, s.order.length); if(s.shown >= total) return; var old = s.shown; s.shown = Math.min(total, s.shown + 6); save(); var c = document.getElementById('rescards'); if(!c){ render(); return; } var near = s.sortMode === 'near'; var list = (near ? orderNear() : s.order).slice(old, s.shown); c.insertAdjacentHTML('beforeend', list.map(function(i, pos){ return shopRowHtml(SHOPS[i], i); }).join('')); var b = document.querySelector('.more'); if(b){ if(s.shown >= total) b.remove(); else b.textContent = moreLabel(); } var first = c.children[old]; if(first) setTimeout(function(){ first.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 60); }
-function openShop(id, keepRet){ sndOpen(); tryLocate(); if(!keepRet) window.__S.ret = 'results'; window.__S.shop=id; window.__S.screen='detail'; save(); render(); }
+function openShop(id, keepRet){ sndOpen(); if(SHOPS[id]) track('detail_view', {shop_key: AREAKEY + '|' + SHOPS[id].n}); tryLocate(); if(!keepRet) window.__S.ret = 'results'; window.__S.shop=id; window.__S.screen='detail'; save(); render(); }
 function setPick(b){ sndTap(); window.__S.pick=b; save(); render(); }
 function favHas(a, n){ return (window.__S.favs || []).some(function(f){ return f.a === a && f.n === n; }); }
 var SVG_PIN = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z" fill="#ff7a00" stroke="#17130c" stroke-width="1.3"/><circle cx="12" cy="9" r="2.5" fill="#ffffff"/></svg>';
@@ -614,13 +626,13 @@ var SVG_OUT = '<svg viewBox="0 0 24 24"><path d="M9 20.4H6.2A2.2 2.2 0 0 1 4 18.
 var SVG_LIST = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5.2" y="4.6" width="13.6" height="16.6" rx="2.4" fill="#ffffff" stroke="#17130c" stroke-width="1.5"/><rect x="9.2" y="2.4" width="5.6" height="3.8" rx="1.9" fill="#ff7a00" stroke="#17130c" stroke-width="1.1"/><circle cx="9.1" cy="11" r="1.25" fill="#ff7a00"/><circle cx="9.1" cy="15.4" r="1.25" fill="#ff7a00"/><path d="M12.4 11h3.9M12.4 15.4h3.9" stroke="#17130c" stroke-width="1.6" stroke-linecap="round"/></svg>';
 var SVG_USER = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6" fill="#ff7a00" stroke="#17130c" stroke-width="1.5"/><path d="M4.8 19.6c1.3-3.6 3.9-5.3 7.2-5.3s5.9 1.7 7.2 5.3" fill="none" stroke="#17130c" stroke-width="1.9" stroke-linecap="round"/></svg>';
 var GSVG = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
-function toggleFav(a, n, ev){ if(ev) ev.stopPropagation(); if(requireLogin()) return; sndTap(); var S = window.__S; if(!S.favs) S.favs = []; var i = -1; S.favs.forEach(function(f, j){ if(f.a === a && f.n === n) i = j; }); if(i >= 0){ S.favs.splice(i, 1); toast(T('お気に入りから外したよ')); } else { S.favs.push({a: a, n: n}); toast(T('お気に入りに追加したよ')); } var __sc = document.querySelector('.dscroll') || document.querySelector('.sheet'); var __sy = __sc ? __sc.scrollTop : 0; save(); render(); var __sc2 = document.querySelector('.dscroll') || document.querySelector('.sheet'); if(__sc2 && __sy) __sc2.scrollTop = __sy; }
+function toggleFav(a, n, ev){ if(ev) ev.stopPropagation(); if(requireLogin()) return; sndTap(); var S = window.__S; if(!S.favs) S.favs = []; var i = -1; S.favs.forEach(function(f, j){ if(f.a === a && f.n === n) i = j; }); if(i >= 0){ S.favs.splice(i, 1); toast(T('お気に入りから外したよ')); } else { S.favs.push({a: a, n: n}); track('fav_add', {shop_key: a + '|' + n}); toast(T('お気に入りに追加したよ')); } var __sc = document.querySelector('.dscroll') || document.querySelector('.sheet'); var __sy = __sc ? __sc.scrollTop : 0; save(); render(); var __sc2 = document.querySelector('.dscroll') || document.querySelector('.sheet'); if(__sc2 && __sy) __sc2.scrollTop = __sy; }
 function favList(){ var out = []; (window.__S.favs || []).forEach(function(f){ var arr = AREAS[f.a]; if(!arr) return; for(var i = 0; i < arr.length; i++){ if(arr[i].n === f.n){ out.push({a: f.a, i: i, sh: arr[i]}); break; } } }); return out; }
 function openFavShop(a, i){ window.__S.area = a; syncArea(); openShop(i, true); window.__S.ret = 'fav'; save(); }
 function openProfSave(){ if(requireLogin()) return; window.__S.profSave = true; save(); render(); setTimeout(function(){ var el = document.getElementById('profname'); if(el) el.focus(); }, 80); }
 function ansSummary(a){ var parts = []; QS.forEach(function(q){ if(a[q.k]) parts.push(a[q.k]); }); return parts.slice(0, 3).join('・') || T('いつもの条件'); }
 function saveProfile(){ var inp = document.getElementById('profname'); var nm = ((inp && inp.value) || '').trim() || ansSummary(window.__S.ans); var S = window.__S; if(!S.profs) S.profs = []; S.profs.push({name: nm, ans: JSON.parse(JSON.stringify(S.ans))}); S.profSave = false; toast(T('プロファイルを保存したよ')); save(); render(); }
-function applyProfile(i){ var p = (window.__S.profs || [])[i]; if(!p) return; sndTap(); window.__S.ans = JSON.parse(JSON.stringify(p.ans)); window.__S.screen = 'think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.profSave = false; window.__S.ret = 'results'; save(); render(); }, 1700); }
+function applyProfile(i){ var p = (window.__S.profs || [])[i]; if(!p) return; sndTap(); window.__S.ans = JSON.parse(JSON.stringify(p.ans)); window.__S.screen = 'think'; save(); render(); setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.profSave = false; __frs(); window.__S.ret = 'results'; save(); render(); }, 1700); }
 function delProfile(i){ var p = (window.__S.profs || [])[i]; if(p && p.pubId && __sb) __sb.from('pub_profiles').delete().eq('id', p.pubId).then(function(){}); (window.__S.profs || []).splice(i, 1); save(); render(); }
 function pickStation(which){ window.__S.stnPick = which; window.__S.showAreas = true; save(); render(); }
 function chooseStation(k){ var S = window.__S; if(!S.stn) S.stn = {home: '', work: ''}; S.stn[S.stnPick] = k || ''; S.stnPick = null; S.showAreas = false; save(); render(); }
@@ -715,7 +727,7 @@ syncArea();
 setTimeout(tryLocate, 600);
 document.getElementById('botlayer').innerHTML = botHtml();
 botState.vid = 'idle';
-if(window.__linkProf){ var __lp = window.__linkProf; window.__linkProf = null; window.__S.area = __lp.a; syncArea(); window.__S.ans = __lp.ans; window.__S.screen = 'think'; setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.ret = 'results'; save(); render(); }, 1700); }
+if(window.__linkProf){ var __lp = window.__linkProf; window.__linkProf = null; window.__S.area = __lp.a; syncArea(); window.__S.ans = __lp.ans; window.__S.screen = 'think'; setTimeout(function(){ window.__S.order = rankShops(window.__S.ans); window.__S.shown = 3; window.__S.screen = 'results'; window.__S.ret = 'results'; __frs(); save(); render(); }, 1700); }
 render();
 </script>
 <style>
