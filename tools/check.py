@@ -253,9 +253,14 @@ ok('favbtn' in html and '保存済み' in html and 'lsheetnote' in html and '行
 _ev125 = set()
 for _seg125 in html.split('track(' + chr(39))[1:]:
     _ev125.add(_seg125.split(chr(39))[0])
-ok(_ev125 == {'home_view', 'quiz_start', 'quiz_step', 'first_results_shown', 'sort_click', 'card_click', 'detail_view', 'call_click', 'map_click', 'fav_add', 'log_add', 'login_prompt_shown', 'login_complete', 'lang_switch'}, 'v125: tracker wires exactly the approved 14 events')
+ok(_ev125 == {'home_view', 'quiz_start', 'quiz_step', 'first_results_shown', 'sort_click', 'card_click', 'detail_view', 'call_click', 'map_click', 'fav_add', 'log_add', 'login_prompt_shown', 'login_complete', 'lang_switch', 'refine_set', 'refine_clear'}, 'v125+v127: tracker wires exactly the approved 16 events')
 _bad125 = [1 for _seg125 in html.split('track(' + chr(39))[1:] if ('lat' in _seg125.split('}', 1)[0] or 'lng' in _seg125.split('}', 1)[0])]
 ok(not _bad125, 'v125: no tracker prop carries location keys')
 ok('/rest/v1/events' in html and 'nb_sid' in html and 'pagehide' in html and 'function track(' in html, 'v125: anonymous tracker posts to the events endpoint with a session id')
+ok('function answerArea(' in html and 'どのエリアで飲む？' in html and 'QS.length' not in html, 'v127: quiz mandatory path is area/people/budget with n/3 progress')
+ok('function refineChipsHtml(' in html and 'refchips' in html and 'function refineSheetHtml(' in html and 'function setRefine(' in html and 'function clearRefine(' in html, 'v127: results refine chips + bottom sheet wired')
+ok('function applyRank(' in html and 'function critOk(' in html and 'を外して探しました' in html and '条件をゆるめて探しました' in html, 'v127: no-result relaxation ladder with notice')
+ok('function matchReasons(' in html and 'srreason' in html and 'reasonHtml(sh)' in html, 'v127: match-reason line on result cards')
+ok('catW(DRINK' in html and 'catW(FOOD' in html and 'catW(MOOD' in html, 'v127: first-hit-dominant category weights in scorer')
 print("RESULT:", "ALL PASS" if not fails else "%d FAILURES" % len(fails))
 sys.exit(1 if fails else 0)
