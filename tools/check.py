@@ -246,7 +246,7 @@ ok("initGMap" not in html and "loadGMaps" not in html and "__GMK__" not in html,
 ok("この条件を保存する" in html and "マップで見る" in html, "v119: results save link, map button labels")
 ok("ログインしてはじめよう" in html and "gatebody" in html, "v119: gate uses the shared login component")
 ok("qtext2" in html and "タップで次の質問へ" in html and "qprog" in html, "v119: quiz small mascot + progress hairline")
-ok('stag' in html and 'scnt' in html and 'sgroup' in html and '.scline{display:flex' in html and 'attrrow' in html and '.wentbtn{display:inline-flex' in html and '.dbtx{font-size:13.5px' in html, 'v124: score groups separated with air, went pill moved into the attr row')
+ok('stag' in html and 'scnt' in html and 'sgroup' in html and '.scline{display:flex' in html and 'dheadrow' in html and 'dheadmain' in html and 'attrrow' not in html and '.wentbtn{display:inline-flex' in html and '.dbtx{font-size:13.5px' in html, 'v124+v128: score groups separated with air, went pill in the shop-name row')
 ok('function scoreBlocks(' in html and '.scblocks{' in html and '.scblock{' in html and 'scsrc' in html, 'v126: detail scores render as two separate beige blocks')
 ok('function locSheetHtml(' in html and '現在地を使いますか？' in html and 'function locSheetUse(' in html and 'function locSheetStay(' in html and 'おすすめ順で表示しています' in html and 'locSheet:false' in html, 'v123: near sort opens a location-consent sheet; denial keeps recommended order with a notice, never silent')
 ok('favbtn' in html and '保存済み' in html and 'lsheetnote' in html and '行った店に保存されます' in html and 'hometrust' in html and 'ログインなしで使えます' in html and 'エリア・予算・人数・好みから' in html and 'No account needed' in html, 'v124: labelled save button, log sheet sync note, home concrete copy plus trust line')

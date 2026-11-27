@@ -487,9 +487,9 @@ function render(){ syncArea();
     var favOn = favHas(AREAKEY, sh.n);
     h = '<div class="page dpage"><div class="phd">' + bkHtml('go(window.__S.ret||\'results\')') + '</div>'
       + '<div class="dbody">' + top2
-      + '<div class="dname">' + sh.n + '</div>' + (sh.g ? '<div class="dgenre2">' + dispG(sh) + '</div>' : '')
+      + '<div class="dheadrow"><div class="dheadmain"><div class="dname">' + sh.n + '</div>' + (sh.g ? '<div class="dgenre2">' + dispG(sh) + '</div>' : '') + '</div>' + wentBtnHtml() + '</div>'
       + scoreBlocks(sh)
-      + '<div class="attrrow"><div class="attrline">' + attrLine(sh) + '</div>' + wentBtnHtml() + '</div>'
+      + '<div class="attrline">' + attrLine(sh) + '</div>'
       + (sh.w ? '<div class="dband"><img src="'+ANIM.idle+'"><div class="dbtx"><div>'+sh.w+'</div></div></div>' : '')
       + '<div class="kv dkv">' + (sh.b ? '<div class="krow"><b>'+T('予算')+'</b><span>'+shortB(sh.b)+'</span></div>' : '') + (sh.h ? '<div class="krow"><b>'+T('営業')+'</b><span>'+shortH(sh.h)+'</span></div>' : '') + (sh.a ? '<div class="krow"><b>'+T('住所')+'</b><span>'+sh.a+'</span></div>' : '') + (sh.s ? '<div class="krow"><b>'+T('酒')+'</b><span>'+shortS(sh.s)+'</span></div>' : '') + '</div>'
       + ((sh.h || sh.b || sh.s) ? '<div class="dexp"><button class="dexphead" onclick="dExpToggle()"><span>' + T('営業時間・予算・お酒の詳しく見る') + '</span><span class="dexpchev" id="dexpchev">▾</span></button><div class="dexpbody kv" id="dexpbody" style="display:none">' + (sh.h ? '<div class="krow"><b>'+T('営業')+'</b><span>'+sh.h+'</span></div>' : '') + (sh.b ? '<div class="krow"><b>'+T('予算')+'</b><span>'+sh.b+'</span></div>' : '') + (sh.s ? '<div class="krow"><b>'+T('酒')+'</b><span>'+sh.s+'</span></div>' : '') + '</div></div>' : '')
@@ -1356,12 +1356,12 @@ div.crimg.noimg{height:56px}
 .dpage .phd{position:sticky;top:0;background:#fff9ef;z-index:5}
 .dbody{padding:2px 16px 20px}
 .dpage .dphotos{height:168px}
-.dpage .dname{font-size:20px;margin-top:12px;line-height:1.35}
+.dpage .dname{font-size:20px;line-height:1.35}
+.dheadrow{display:flex;align-items:flex-start;gap:10px;margin-top:12px}
+.dheadmain{flex:1;min-width:0}
 .dgenre2{font-size:12.5px;color:#a5762a;font-weight:800;margin-top:3px}
 .dpage .scblocks{margin-top:10px}
-.attrrow{display:flex;align-items:center;gap:10px;margin-top:5px}
-.attrline{font-size:12.5px;color:#96805a;font-weight:700}
-.attrrow .attrline{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attrline{font-size:12.5px;color:#96805a;font-weight:700;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dpage .dband{margin-top:12px}
 .wentbtn{display:inline-flex;align-items:center;justify-content:center;height:37px;padding:0 16px;border-radius:999px;border:1.8px solid #ff7a00;background:#fff;color:#ff7a00;font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer;flex:none}
 .wentbtn.done{background:#fff6e8;color:#b35c00;border-color:#e3d3ac}
